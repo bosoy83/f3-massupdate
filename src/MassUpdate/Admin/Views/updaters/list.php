@@ -8,17 +8,40 @@
 			</span>
 		</h1>
 	</div>
-	<div class="col-xs-12 col-sm-5 col-md-5 col-lg-8">
-        <ul id="sparks" class="list-actions list-unstyled list-inline">
-            <li>
-                <a class="btn btn-default" href="./admin/redirect/route/create">Add New</a>
-            </li>
-        </ul>            	
-	</div>
 </div>
 
-<div class="row">
-	<form id="routes" class="searchForm" action="./admin/redirect/routes" method="post">
-		dude
-	</form>
-</div>
+
+<form id="updaters" class="updatersForm" action="./admin/massupdate/updater" method="post">
+	<div class="row">
+		<div class="col-xs-10 col-sm-6 col-md-6 col-lg-4">
+			<div class="form-group">
+				<div class="input-group">
+					<select id="bulk-actions" name="bulk_action" class="form-control">
+						<option value="null">-Pick Updater-</option>
+<?php
+		$updaters = $service->getGroups();
+		if( count( $updaters ) > 0 ) {
+			foreach( $updaters as $updater ){ ?>
+						<option value="<?php echo $updater->slug;?>"
+							data-action="./admin/massupdate/updaters/<?php echo $updater->slug;?>" 
+							<?php echo $selected === $updater->slug ? 'selected' : '';?>>
+							<?php echo $updater->title;?>
+						</option>
+<?php 
+			}
+		} ?>
+					</select>
+					<span class="input-group-btn">
+						<button class="btn btn-default bulk-actions" type="button" data-target="bulk-actions">Apply</button>
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+		
+	<div class="row">
+		<form id="routes" class="searchForm" action="./admin/massupdate/updaters" method="post">
+			dude
+		</form>
+	</div>
+</form>

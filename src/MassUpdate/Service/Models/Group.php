@@ -10,6 +10,7 @@ abstract class Group extends \Prefab
 	 * Title of this group
 	 */
 	public $title;
+	public $slug;
 	
 	/**
 	 * All models registered for mass update from this gruop

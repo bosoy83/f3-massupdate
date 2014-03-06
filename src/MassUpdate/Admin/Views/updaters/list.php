@@ -24,7 +24,7 @@
 			foreach( $updaters as $updater ){ ?>
 						<option value="<?php echo $updater->slug;?>"
 							data-action="./admin/massupdate/updaters/<?php echo $updater->slug;?>" 
-							<?php echo $selected === $updater->slug ? 'selected' : '';?>>
+							<?php echo $selected == $updater->slug ? 'selected' : '';?>>
 							<?php echo $updater->title;?>
 						</option>
 <?php 

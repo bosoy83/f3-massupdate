@@ -1,6 +1,9 @@
 <?php 
 namespace MassUpdate\Service\Models;
 
+/**
+ * Abstract class containig a group of models which all support mass update
+ */
 abstract class Group extends \Prefab 
 {
 	/**
@@ -11,11 +14,30 @@ abstract class Group extends \Prefab
 	/**
 	 * All models registered for mass update from this gruop
 	 */
-	protected $models = array();
+	private $models = array();
 	
 	/**
-	 * 
-	 * List of models for this group
+	 * Initialize list of models
 	 */
-	public function getModels();
+	public abstract function initialize();
+	
+	/**
+	 * Adds a model into group
+	 * 
+	 * @param $model Model to be added into the group
+	 * @return Instance of this class to support chaining of commands
+	 */
+	protected function addModel( $model ){
+		$this->models []= $model;
+		return $this;
+	}
+	
+	/**
+	 * List of models for this group
+	 * 
+	 * @return	Array with all registered models
+	 */
+	public function getModels(){
+		return $this->models;
+	}
 }

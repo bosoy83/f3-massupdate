@@ -11,6 +11,7 @@ class AttributeGroup extends \Prefab
 	 */
 	protected $attribute;
 	
+	
 	/**
 	 * List of operations
 	 */
@@ -23,7 +24,7 @@ class AttributeGroup extends \Prefab
 	 * 
 	 * @return Instance of this class in order to support chaining of operations
 	 */
-	public function setAttribute($attr){
+	public function setAttributeCollection($attr){
 		$this->attribute = $attr;
 		return $this;
 	}

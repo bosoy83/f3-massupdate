@@ -26,7 +26,10 @@ class Routes extends \Dsc\Routes\Group{
 				)
 		);
 		
-//		$this->addSettingsRoutes();
-//		$this->addCrudGroup( 'Routes', 'Route', array('datatable_links' => true));
+		
+		$this->add( '/updaters', 'GET', array(
+							'controller' => 'Updaters',
+							'action' => 'index'
+							));
 	}
 }

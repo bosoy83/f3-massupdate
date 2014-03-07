@@ -9,11 +9,11 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		$f3->set('pagetitle', 'Mass Update');
 		$f3->set('subtitle', '');
 
-		$service = new \MassUpdate\Service\MassUpdate;
-		print_r( $service );
+		$service = \Dsc\System::instance()->get('massupdate');
 		$selected = $f3->get("PARAMS.id");
 		$f3->set('service', $service );
 		$f3->set('selected', $selected );
+		$service->initializeGroups();
 		
 		echo \Dsc\System::instance()->get('theme')->render('MassUpdate/Admin/Views::updaters/list.php');
 	}

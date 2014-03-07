@@ -11,6 +11,7 @@ class MassUpdate extends \Prefab
 	 * @param $group	Group with title and list of supported models
 	 */
 	public function regiseterGroup($group){
+		print_r( $group );
 		$this->list_groups []=$group;
 	}
 

@@ -6,7 +6,7 @@ namespace MassUpdate\Service\Models;
  * MassUpdate
  */
 interface MassUpdateOperations{
-
+	
 	/**
 	 * This method gets list of UpdateOperation groups
 	 */

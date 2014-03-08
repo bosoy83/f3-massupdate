@@ -2,10 +2,10 @@
 namespace MassUpdate\Operations\Update;
 
 /**
- * Appends string to already existing string
+ * Change value to this one
  * 
  */
-class AppendTo extends \MassUpdate\Operations\Operation{
+class ChangeTo extends \MassUpdate\Operations\Operation{
 
 	/**
 	 * This method returns update class which will be later on passed to db mapper
@@ -28,7 +28,7 @@ class AppendTo extends \MassUpdate\Operations\Operation{
 	 * operation in form
 	 */
 	public function getLabel(){
-		return "Append this string";
+		return "Change to this string";
 	}
 }
 ?>

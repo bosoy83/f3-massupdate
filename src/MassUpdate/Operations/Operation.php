@@ -1,8 +1,8 @@
 <?php 
-namespace MassUpdate\Operations\Update;
+namespace MassUpdate\Operations;
 
 /**
- * Base class for all update operations
+ * Base class for all operations
  * 
  */
 abstract class Operation{
@@ -24,7 +24,7 @@ abstract class Operation{
 	public abstract function getUpdateClause();
 	
 	/**
-	 * This method returns string representation how the update clause should be rendered in form
+	 * This method returns string representation how the operation should be rendered in form
 	 */
 	public abstract function getFormHtml();
 	

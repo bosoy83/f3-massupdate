@@ -1,7 +1,3 @@
-<?php 
-
-?>
-
 <div class="row">
 	<div class="col-xs-12 col-sm-7 col-md-7 col-lg-4">
 		<h1 class="page-title txt-color-blueDark">
@@ -16,13 +12,21 @@
 
 
 <form id="updaters" class="updatersForm" action="./admin/massupdate/updater" method="post">
-	<div class="row">
-        <?php echo $this->renderLayout('MassUpdate/Admin/Views::updaters/list_models.php'); ?>
-	</div>
-		
+	<div class="no-padding">
+		<div class="widget-body-toolbar">
+			<div class="row">
+		        <?php echo $this->renderLayout('MassUpdate/Admin/Views::updaters/list_models.php'); ?>
+			</div>
+		</div>
+	</div>	
 	<div class="row">
 		<form id="routes" class="searchForm" action="./admin/massupdate/updaters" method="post">
 			dude
 		</form>
+	</div>
+	<hr />
+	
+	<div class="row">
+		<?php echo $this->renderLayout('MassUpdate/Admin/Views::updaters/list_models.php'); ?>
 	</div>
 </form>

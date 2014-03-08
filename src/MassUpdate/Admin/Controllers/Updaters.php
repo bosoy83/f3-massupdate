@@ -10,29 +10,35 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		$f3->set('subtitle', '');
 
 		$service = \Dsc\System::instance()->get('massupdate');
-		$selected = $f3->get("PARAMS.id");
-		$f3->set('service', $service );
-		$f3->set('selected', $selected );
 		$service->initializeGroups();
+		$selected_updater = $f3->get("PARAMS.id");
+		$selected_model = $f3->get("PARAMS.model");
+		$f3->set('service', $service );
+		$f3->set('selected_updater', $selected_updater );
+		$f3->set('selected_model', $selected_model );
+		$f3->set('models', $this->getModelsMetadata());
 		
 		echo \Dsc\System::instance()->get('theme')->render('MassUpdate/Admin/Views::updaters/list.php');
 	}
 	
 	private function getModelsMetadata(){
+		$models = array();
+		$updaters = \Dsc\System::instance()->get('massupdate')->getGroups();
 		if( count( $updaters ) > 0 ) {
-			$models = array();
 			foreach($updaters as $updater ) {
 				if( count( $updater->getModels() ) > 0 ){
 					$m = $updater->getModels();
 					foreach( $m as $model ){
 						$models []= array(
-								'slug' => $model
+								'slug' => $model->getSlugMassUpdate(),
+								'updater' => $updater->slug,
+								'title' => $model->getTitleMassUpdate(),
+								'title_updater' => $updater->title
 						);
 					}
 				}
 			}
 		}
-		
-				
+		return $models;
 	}
 }

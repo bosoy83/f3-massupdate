@@ -34,5 +34,9 @@ class Routes extends \Dsc\Routes\Group{
 							'controller' => 'Updaters',
 							'action' => 'index'
 							));
+		$this->add( '/updaters/@id/@model', array('GET', 'POST'), array(
+							'controller' => 'Updaters',
+							'action' => 'index'
+							));
 	}
 }

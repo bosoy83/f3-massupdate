@@ -11,6 +11,10 @@ class AttributeGroup extends \Prefab
 	 */
 	protected $attribute;
 	
+	/**
+	 * Name of attribute displayed in system
+	 */
+	protected $title;
 	
 	/**
 	 * List of operations
@@ -28,6 +32,27 @@ class AttributeGroup extends \Prefab
 		$this->attribute = $attr;
 		return $this;
 	}
+	
+	/**
+	 * Sets name of this attribute group which will appear in system
+	 * 
+	 * @param $t	Name of the group
+	 * 
+	 * @return Instance of this class in order to support chaining of operations
+	 */
+	public function setAttributeTitle( $t ){
+		$this->title = $t;
+		return $this;
+	}
+	/**
+	 * Gets name of this attribute group which will appear in system
+	 *
+	 * @return	Name of the group
+	 */
+	public function getAttributeTitle(){
+		return $this->title;
+	}
+	
 	
 	/**
 	 * This method adds operation into list of operations for this group

@@ -5,19 +5,19 @@ namespace MassUpdate\Operations\Update;
  * Base class for all update operations
  * 
  */
-class AppendTo extends MassUpdate\Operations\Update\Operation{
+class AppendTo extends \MassUpdate\Operations\Update\Operation{
 
 	/**
 	 * This method returns update class which will be later on passed to db mapper
 	 */
-	public abstract function getUpdateClause(){
+	public function getUpdateClause(){
 		return array();
 	}
 	
 	/**
 	 * This method returns string representation how the update clause should be rendered in form
 	 */
-	public abstract function getFormHtml(){
+	public function getFormHtml(){
 		return "here should be HTML";
 	}
 	
@@ -25,7 +25,7 @@ class AppendTo extends MassUpdate\Operations\Update\Operation{
 	 * This method returns label for getFormHtml() element which should be used as a label for this
 	 * operation in form
 	 */
-	public abstract function getLabel(){
+	public function getLabel(){
 		return "Append this string";
 	}
 }

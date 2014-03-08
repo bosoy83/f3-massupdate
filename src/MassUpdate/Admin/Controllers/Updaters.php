@@ -41,4 +41,25 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		}
 		return $models;
 	}
+	
+	public function getModelOptions( $updater, $model ) {
+		$service = \Dsc\System::instance()->get('massupdate');
+		$service->initializeGroups();
+		$groups = $service->getGroup( $updater );
+		$selected_model = null;
+		// find selected model
+		if( $groups != null && count( $models = $groups->getModels() ) > 0 ){
+			foreach( $models as $m ){
+				if( $m->getSlugMassUpdate() == $model ){
+					$selected_model = $m;
+					break;
+				}
+			}
+		}
+		if( $selected_model != null ){
+			\Base::instance()->set( "model", $selected_model );
+			echo \Dsc\System::instance()->get('theme')->renderLayout('MassUpdate/Admin/Views::updaters/list_options.php');
+		}
+		
+	}
 }

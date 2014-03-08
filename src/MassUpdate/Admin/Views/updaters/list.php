@@ -21,12 +21,9 @@
 	</div>	
 	<div class="row">
 		<form id="routes" class="searchForm" action="./admin/massupdate/updaters" method="post">
-			dude
+			<?php echo \Dsc\Request::internal( "\MassUpdate\Admin\Controllers\Updaters->getModelOptions", array($selected_updater, $selected_model ) ); ?>
 		</form>
 	</div>
 	<hr />
 	
-	<div class="row">
-		<?php echo $this->renderLayout('MassUpdate/Admin/Views::updaters/list_models.php'); ?>
-	</div>
 </form>

@@ -62,7 +62,7 @@ class AttributeGroup extends \Prefab
 	 * @return Instance of this class in order to support chaining of operations
 	 */
 	public function addOperation( $op ){
-		if( $op instanceof \MassUpdate\Operations\Update\Operation ){
+		if( $op instanceof \MassUpdate\Operations\Operation ){
 			$op->setAttributeName( $this->attribute );
 			$this->operations []= $op;
 		} else { // warn us, if we pass here instance of an unsupported object

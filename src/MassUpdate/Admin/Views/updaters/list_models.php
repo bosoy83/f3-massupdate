@@ -89,8 +89,17 @@ $(function(){
 			Dsc.MassUpdateUpdateSelectModels("", $opt.data('slug'));
 		}); 
 
-	$( '#updater-models' ).on( "change", function(){
-		// loads form with values to update
+	$( '#updater-model' ).on( "change", function(){
+		var this_url = $( "option:selected", $(this)).data("action");
+	    var request = jQuery.ajax({
+	        type: 'get', 
+	        url: this_url
+	    }).done(function(data){
+	        var lr = jQuery.parseJSON( JSON.stringify(data), false);
+	        if (lr.result) {
+	            jQuery('#updater-data').html(lr.result);
+	        }
+	    });
 	}); 
 });
 </script>

@@ -42,7 +42,11 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		return $models;
 	}
 	
-	public function getModelOptions( $updater, $model ) {
+	public function getUpdaterData($updater, $model) {
+		echo $this->getUpdaterDataHtml($updater, $model);
+	}
+	
+	private function getUpdaterDataHtml($updater, $model){
 		$service = \Dsc\System::instance()->get('massupdate');
 		$service->initializeGroups();
 		$groups = $service->getGroup( $updater );
@@ -58,8 +62,20 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		}
 		if( $selected_model != null ){
 			\Base::instance()->set( "model", $selected_model );
-			echo \Dsc\System::instance()->get('theme')->renderLayout('MassUpdate/Admin/Views::updaters/list_options.php');
+			return \Dsc\System::instance()->get('theme')->renderLayout('MassUpdate/Admin/Views::updaters/list_options.php');
 		}
+		return "";
+	}
+	
+	public function getUpdaterDataAjax(){
+		$f3 = \Base::instance();
+		$updater = $f3->get("PARAMS.updater");
+		$model = $f3->get("PARAMS.model");
 		
+		$html = $this->getUpdaterDataHtml( $updater, $model );
+
+        echo $this->outputJson( $this->getJsonResponse( array(
+                'result' => $html
+        ) ) );
 	}
 }

@@ -38,5 +38,11 @@ class Routes extends \Dsc\Routes\Group{
 							'controller' => 'Updaters',
 							'action' => 'index'
 							));
+
+		$this->add( '/updaters/@updater/@model', 'GET', array(
+							'controller' => 'Updaters',
+							'action' => 'getUpdaterDataAjax',
+							'ajax' => true
+							));
 	}
 }

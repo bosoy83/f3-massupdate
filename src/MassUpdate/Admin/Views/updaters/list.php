@@ -19,10 +19,8 @@
 			</div>
 		</div>
 	</div>	
-	<div class="row">
-		<form id="routes" class="searchForm" action="./admin/massupdate/updaters" method="post">
-			<?php echo \Dsc\Request::internal( "\MassUpdate\Admin\Controllers\Updaters->getModelOptions", array($selected_updater, $selected_model ) ); ?>
-		</form>
+	<div class="row" id="updater-data">
+		<?php echo \Dsc\Request::internal( "\MassUpdate\Admin\Controllers\Updaters->getUpdaterData", array( $selected_updater, $selected_model ) ); ?>
 	</div>
 	<hr />
 	

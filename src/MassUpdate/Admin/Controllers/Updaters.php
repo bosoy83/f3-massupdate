@@ -62,7 +62,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		}
 		if( $selected_model != null ){
 			\Base::instance()->set( "model", $selected_model );
-			return \Dsc\System::instance()->get('theme')->renderLayout('MassUpdate/Admin/Views::updaters/list_options.php');
+			return \Dsc\System::instance()->get('theme')->renderLayout('MassUpdate/Admin/Views::updaters/list_data.php');
 		}
 		return "";
 	}

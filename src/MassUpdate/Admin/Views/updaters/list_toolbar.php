@@ -80,16 +80,16 @@ Dsc.MassUpdateUpdateSelectModels = function(selected_model, selected_updater){
 	}
 }
 
-$(function(){
+jQuery(function(){
 	Dsc.MassUpdateUpdateSelectUpdaters("<?php echo $selected_updater; ?>");
 	Dsc.MassUpdateUpdateSelectModels("<?php echo $selected_model; ?>", "<?php echo $selected_updater; ?>");
 
-	$( '#updater-group' ).on( "change", function(){
-			var $opt = $("option:selected", $(this));
+	jQuery('#updater-group' ).on( "change", function(){
+			var $opt = jQuery("option:selected", $(this));
 			Dsc.MassUpdateUpdateSelectModels("", $opt.data('slug'));
 		}); 
 
-	$( '#updater-model' ).on( "change", function(){
+	jQuery( '#updater-model' ).on( "change", function(){
 		var this_url = $( "option:selected", $(this)).data("action");
 	    var request = jQuery.ajax({
 	        type: 'get', 
@@ -98,9 +98,14 @@ $(function(){
 	        var lr = jQuery.parseJSON( JSON.stringify(data), false);
 	        if (lr.result) {
 	            jQuery('#updater-data').html(lr.result);
+	            jQuery('form#updaters').prop("action", lr.result);
 	        }
 	    });
 	}); 
+
+	$("#perform-update").on("click", function(){
+			thos.form.submit();
+		});
 });
 </script>
 
@@ -115,6 +120,13 @@ $(function(){
 		<div class="input-group pull-right">
 			<select id="updater-model" name="updater_model" class="form-control">
 			</select>
+		</div>
+	</div>
+</div>
+<div class="col-xs-10 col-sm-6 col-md-6 col-lg-8">
+	<div class="form-group pull-right">
+		<div class="input-group">
+			<button id="perform-update" class="form-control">Perform</button>
 		</div>
 	</div>
 </div>

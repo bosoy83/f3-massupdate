@@ -5,15 +5,15 @@ namespace MassUpdate\Operations\Update;
  * Change value to this one
  * 
  */
-class ChangeTo extends \MassUpdate\Operations\Operation{
+class IncreaseBy extends \MassUpdate\Operations\Operation{
 
 	/**
 	 * This method returns update class which will be later on passed to db mapper
 	 */
 	public function getUpdateClause($data){
 		$data = \Joomla\Filter\InputFilter::clean($data, "float");
-		return array('$set', $this->getAttributeCollection().' = '.$data );
-			}
+		return array('$inc', $this->getAttributeCollection().' = '.$data );
+	}
 	
 	/**
 	 * This method returns string representation how the operation should be rendered in form
@@ -29,7 +29,7 @@ class ChangeTo extends \MassUpdate\Operations\Operation{
 	 * operation in form
 	 */
 	public function getLabel(){
-		return "Change to this value";
+		return "Increase by";
 	}
 }
 ?>

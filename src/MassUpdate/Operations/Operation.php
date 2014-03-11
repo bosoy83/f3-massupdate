@@ -21,7 +21,7 @@ abstract class Operation{
 	/**
 	 * This method returns update class which will be later on passed to db mapper
 	 */
-	public abstract function getUpdateClause();
+	public abstract function getUpdateClause($data);
 	
 	/**
 	 * This method returns string representation how the operation should be rendered in form
@@ -29,13 +29,13 @@ abstract class Operation{
 	public abstract function getFormHtml();
 	
 	/**
-	 * This method sets name of attribute for this operation
+	 * This method attribute for this operation
 	 * 
-	 * @param $attr		Name of the attribute in collection
+	 * @param $attr		Attribute in collection
 	 * 
 	 * @return Instance of this class in order to support chaining of operations
 	 */
-	public function setAttributeName($attr){
+	public function setAttribute($attr){
 		$this->attribute = $attr;
 		
 		return $this;

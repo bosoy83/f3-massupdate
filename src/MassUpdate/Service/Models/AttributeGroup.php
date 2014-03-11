@@ -22,7 +22,7 @@ class AttributeGroup extends \Prefab
 	protected $operations = array();
 
 	/**
-	 * This method sets name of attribute in collection for this group of update operations
+	 * This method sets name of attribute in collection for this group of operations
 	 * 
 	 * @param $attr Name in collection
 	 * 
@@ -31,6 +31,15 @@ class AttributeGroup extends \Prefab
 	public function setAttributeCollection($attr){
 		$this->attribute = $attr;
 		return $this;
+	}
+
+	/**
+	 * This method gets name of attribute in collection for this group of operations
+	 *
+	 * @return Name in collection
+	 */
+	public function getAttributeCollection(){
+		return $this->attribute;
 	}
 	
 	/**
@@ -63,7 +72,7 @@ class AttributeGroup extends \Prefab
 	 */
 	public function addOperation( $op ){
 		if( $op instanceof \MassUpdate\Operations\Operation ){
-			$op->setAttributeName( $this->attribute );
+			$op->setAttribute( $this );
 			$this->operations []= $op;
 		} else { // warn us, if we pass here instance of an unsupported object
 			throw new \Exception( "Unsupported Operation object" );

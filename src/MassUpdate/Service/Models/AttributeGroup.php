@@ -88,4 +88,13 @@ class AttributeGroup extends \Prefab
 	public function getOperations(){
 		return $this->operations;
 	}
+	
+	/**
+	 * This method returns instance of input filter assigned to this attribute group
+	 *
+	 * @return Instance of InputFilter
+	 */
+	public function getInputFilter(){
+		return \Dsc\System::instance()->get('inputfilter');
+	}
 }

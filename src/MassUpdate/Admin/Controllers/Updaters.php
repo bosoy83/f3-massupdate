@@ -6,21 +6,27 @@ class Updaters extends \Admin\Controllers\BaseAuth
 	public function index()
 	{
 		$f3 = \Base::instance();
-		$f3->set('pagetitle', 'Mass Update');
-		$f3->set('subtitle', '');
-
-		$service = \Dsc\System::instance()->get('massupdate');
-		$service->initializeGroups();
 		$selected_updater = $f3->get("PARAMS.id");
 		$selected_model = $f3->get("PARAMS.model");
-		$f3->set('service', $service );
-		$f3->set('selected_updater', $selected_updater );
-		$f3->set('selected_model', $selected_model );
-		$f3->set('models', $this->getModelsMetadata());
 		
+		echo $this->getListHtml($selected_updater, $selected_model );
+	}
+
+	private function getListHtml($updater, $model ){
+		$f3 = \Base::instance();
+		$f3->set('pagetitle', 'Mass Update');
+		$f3->set('subtitle', '');
+		
+		$service = \Dsc\System::instance()->get('massupdate');
+		$service->initializeGroups();
+		$f3->set('service', $service );
+		$f3->set('selected_updater', $updater );
+		$f3->set('selected_model', $model );
+		$f3->set('models', $this->getModelsMetadata());
+
 		echo \Dsc\System::instance()->get('theme')->render('MassUpdate/Admin/Views::updaters/list.php');
 	}
-	
+
 	private function getModelsMetadata(){
 		$models = array();
 		$updaters = \Dsc\System::instance()->get('massupdate')->getGroups();
@@ -41,27 +47,20 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		}
 		return $models;
 	}
-	
+
 	public function getUpdaterData($updater, $model) {
 		echo $this->getUpdaterDataHtml($updater, $model);
 	}
-	
+
 	private function getUpdaterDataHtml($updater, $model){
 		$service = \Dsc\System::instance()->get('massupdate');
 		$service->initializeGroups();
-		$groups = $service->getGroup( $updater );
-		$selected_model = null;
-		// find selected model
-		if( $groups != null && count( $models = $groups->getModels() ) > 0 ){
-			foreach( $models as $m ){
-				if( $m->getSlugMassUpdate() == $model ){
-					$selected_model = $m;
-					break;
-				}
-			}
-		}
+		$selected_model = $service->getModel($model, $updater);
 		if( $selected_model != null ){
-			\Base::instance()->set( "model", $selected_model );
+			$f3 = \Base::instance();
+			$f3->set('selected_updater', $updater );
+			$f3->set('selected_model', $model );
+			$f3->set( "model", $selected_model );
 			return \Dsc\System::instance()->get('theme')->renderLayout('MassUpdate/Admin/Views::updaters/list_data.php');
 		}
 		return "";
@@ -77,5 +76,71 @@ class Updaters extends \Admin\Controllers\BaseAuth
         echo $this->outputJson( $this->getJsonResponse( array(
                 'result' => $html
         ) ) );
+	}
+	
+	public function doUpdate(){
+		$f3 = \Base::instance();
+		$updater = $f3->get("PARAMS.id");
+		$model_name = $f3->get("PARAMS.model");
+		if( strlen( $updater ) == 0 || strlen( $model_name ) == 0 ) {
+			throw new \Exception("Could not find appropriate model and updater in controller Updaters");
+		}
+		$service = \Dsc\System::instance()->get('massupdate');
+		$service->initializeGroups();
+		$selected_model = $service->getModel($model_name, $updater);
+		
+		if( $selected_model == null ){
+			\Dsc\System::instance()->addMessage( "This model does not exist", "error" );
+			echo $this->getListHtml( "", "" );
+			return;
+		}
+		
+		$update_part = $this->processUpdatePart( $selected_model );
+		$collection = $selected_model->collection();
+		$collection->update( array(  ), $update_part, array("multiple" => true  ) );
+		echo $this->getListHtml( $updater, $model_name );
+	}
+	
+	/**
+	 * This method takes out only important data from request, sanitise them via Operations and returns them back to controller for furtner processing
+	 * 
+	 * @param $selected_model	Instance of model
+	 * 
+	 * @return	array of sanitized update commands for mapper
+	 */
+	private function processUpdatePart(  $selected_model ){
+		$updates = array();
+		$attr_groups = $selected_model->getUpdateOperationGroups();
+		$request = \Base::instance()->get('REQUEST');
+
+		if( count( $attr_groups ) > 0 ){
+			foreach( $attr_groups as $attr ){
+				// replace all dots with underscores
+				$attr_name = str_replace('.', '_', $attr->getAttributeCollection());
+				
+				// make sure we have at least some information about this attribute
+				if( !isset( $request[$attr_name.'_cb'] ) || 
+						is_array($request[$attr_name.'_cb']) == false ||
+					!isset($request[$attr_name.'_cb'][0])  ){
+					// something is not right with this attribute -> skip it
+					continue;
+				}
+				$opt = (int)$request[$attr_name.'_cb'][0];
+				$data = empty($request[$attr_name.'_'.$opt]) ? '' : $request[$attr_name.'_'.$opt];
+				// now we need to find operation with a proper index
+				$operations = $attr->getOperations();
+				if( empty( $operations[$opt] ) || !($operations[$opt] instanceof \MassUpdate\Operations\Update )) {
+					// something is not right with this attribute -> skip it
+					continue;
+				}
+				$clause = $operations[$opt]->getUpdateClause( $data );
+				if( !isset( $updates[$clause[0]] ) ){
+					$updates[$clause[0]] = array();
+				}
+				$updates[$clause[0]] = $clause[1] + $updates[$clause[0]];
+			}
+		}
+
+		return $updates;
 	}
 }

@@ -5,15 +5,15 @@ namespace MassUpdate\Operations\Update;
  * Change value to this one
  * 
  */
-class ChangeTo extends \MassUpdate\Operations\Operation{
+class ChangeTo extends \MassUpdate\Operations\Update{
 
 	/**
 	 * This method returns update class which will be later on passed to db mapper
 	 */
 	public function getUpdateClause($data){
-		$data = \Joomla\Filter\InputFilter::clean($data, "float");
-		return array('$set', $this->getAttributeCollection().' = '.$data );
-			}
+		$data = $this->attribute->getInputFilter()->clean($data, "alnum");
+		return array('$set', array( $this->attribute->getAttributeCollection() => $data ));
+	}
 	
 	/**
 	 * This method returns string representation how the operation should be rendered in form

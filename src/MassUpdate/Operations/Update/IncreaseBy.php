@@ -5,14 +5,14 @@ namespace MassUpdate\Operations\Update;
  * Change value to this one
  * 
  */
-class IncreaseBy extends \MassUpdate\Operations\Operation{
+class IncreaseBy extends \MassUpdate\Operations\Update{
 
 	/**
 	 * This method returns update class which will be later on passed to db mapper
 	 */
 	public function getUpdateClause($data){
-		$data = \Joomla\Filter\InputFilter::clean($data, "float");
-		return array('$inc', $this->getAttributeCollection().' = '.$data );
+		$data = $this->attribute->getInputFilter()->clean($data, "float");
+		return array('$inc', $this->attribute->getAttributeCollection().' = '.$data );
 	}
 	
 	/**

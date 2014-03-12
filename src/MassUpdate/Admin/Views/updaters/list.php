@@ -1,20 +1,148 @@
+<?php 
+	$f3 = \Base::instance();
+	// generate array with all models
+	$models = $f3->get('models');
+	$models_js = array();
+	$updaters_js = array();
+	$updaters_list = array();
+	if( count( $models ) > 1){
+		foreach( $models as $model ){
+			$act_model = 'title: "'.$model['title'].'",';
+			$act_model.= 'model_slug: "'.$model['slug'].'",';
+			$act_model.= 'updater_slug: "'.$model['updater'].'"';
+			$models_js []= '{'.$act_model.'}';
+			if( in_array( $model['updater'], $updaters_list ) === false ){
+				$act_updater = 'title: "'.$model['title_updater'].'",';
+				$act_updater.= 'slug: "'.$model['updater'].'"';
+				$updaters_js []= '{'.$act_updater.'}';;
+				$updaters_list []= $model['updater'];
+			}
+		}
+	}
+?>
 <script type="text/javascript">
-jQuery(function(){
+Dsc.MassUpdate = {};
+Dsc.MassUpdate.Models = [<?php echo implode( ',', $models_js ); ?>];
+Dsc.MassUpdate.Updaters = [<?php echo implode( ',', $updaters_js ); ?>];
 
-	Dsc.MassUpdateHandleCheckboxSelectGroup = function(event){
+Dsc.MassUpdate.UpdateSelectUpdaters = function(selected){
+	var updater_select = $('#updater-group');
+
+	Dsc.MassUpdate.Elements.select_updater.empty();
+	$('<option></option>', 
+		{
+			'text' : "-Pick Updater-",
+			'data-slug' : "",
+			'value' : "null"
+		} ).appendTo( Dsc.MassUpdate.Elements.select_updater );
+
+	for( i = 0; i < Dsc.MassUpdate.Updaters.length; i++ ) {
+		var link = "./admin/massupdate/updaters/" + Dsc.MassUpdate.Updaters[i]['slug'];
+		var opt = $('<option></option>', 
+				{
+					'text' : Dsc.MassUpdate.Updaters[i]['title'],
+					'data-slug' : Dsc.MassUpdate.Updaters[i]['slug'],
+					'data-action' : link
+				});
+
+		if( selected == Dsc.MassUpdate.Updaters[i]['slug'] ){
+			opt.attr( "selected", "true" );
+		}
+		opt.appendTo( Dsc.MassUpdate.Elements.select_updater );
+	}
+	if(selected.length == 0){
+		Dsc.MassUpdate.DisableUI();
+	} 
+}
+
+Dsc.MassUpdate.UpdateSelectModels = function(selected_model, selected_updater){
+	Dsc.MassUpdate.Elements.select_model.empty();
+	$('<option></option>', 
+		{
+			'text' : "-Pick Model-",
+			'data-action' : ""
+		} ).appendTo( Dsc.MassUpdate.Elements.select_model );
+
+	for( i = 0; i < Dsc.MassUpdate.Models.length; i++ ) {
+		if( Dsc.MassUpdate.Models[i]['updater_slug'] == selected_updater ) {
+			var link = "./admin/massupdate/updaters/" 
+							+ Dsc.MassUpdate.Models[i]['updater_slug'] + "/"
+							+ Dsc.MassUpdate.Models[i]['model_slug'];
+			var opt = $('<option></option>', 
+					{
+						'text' : Dsc.MassUpdate.Models[i]['title'],
+						'data-action' : link
+					});
+
+			if( selected_model == Dsc.MassUpdate.Models[i]['model_slug'] ){
+				opt.attr( "selected", "true" );
+			}
+			opt.appendTo( Dsc.MassUpdate.Elements.select_model );
+		}
+	}
+}
+
+Dsc.MassUpdate.DisableUI = function(){
+	Dsc.MassUpdate.Elements.perform.hide();
+	Dsc.MassUpdate.Elements.data_wrapper.empty();
+}
+
+Dsc.MassUpdate.CacheElements = function(){
+	Dsc.MassUpdate.Elements = {};
+	Dsc.MassUpdate.Elements.form = jQuery("form#updater");
+	Dsc.MassUpdate.Elements.data_wrapper = jQuery("#updater-data");
+	Dsc.MassUpdate.Elements.select_updater = jQuery("select#updater-group");
+	Dsc.MassUpdate.Elements.select_model = jQuery("select#updater-model");
+	Dsc.MassUpdate.Elements.perform = jQuery("#perform-update");
+}
+
+jQuery(function(){
+	Dsc.MassUpdate.CacheElements();
+	Dsc.MassUpdate.UpdateSelectUpdaters("<?php echo $selected_updater; ?>");
+	Dsc.MassUpdate.UpdateSelectModels("<?php echo $selected_model; ?>", "<?php echo $selected_updater; ?>");
+
+	
+	Dsc.MassUpdate.Elements.select_updater.on( "change", function(){
+			var $opt = jQuery("option:selected", $(this));
+			Dsc.MassUpdate.UpdateSelectModels("", $opt.data('slug'));
+			Dsc.MassUpdate.Elements.perform.hide();
+		}); 
+
+	Dsc.MassUpdate.Elements.select_model.on( "change", function(){
+		var this_url = $( "option:selected", $(this)).data("action");
+		if( this_url.length > 0 ){
+			Dsc.MassUpdate.Elements.perform.show();
+		    var request = jQuery.ajax({
+		        type: 'get', 
+		        url: this_url
+		    }).done(function(data){
+		        var lr = jQuery.parseJSON( JSON.stringify(data), false);
+		        if (lr.result) {
+		        	Dsc.MassUpdate.Elements.data_wrapper.html(lr.result);
+		        }
+		    });
+		} else {
+			Dsc.MassUpdate.DisableUI();
+		}
+	}); 
+
+	Dsc.MassUpdate.Elements.perform.on("click", function(){
+		var $form = $("form#updaters");
+		$form.submit();
+	});
+
+	Dsc.MassUpdate.HandleCheckboxSelectGroup = function(event){
 		$this = jQuery(event.currentTarget);
 
 		console.log(event.currentTarget);
 		var group = $this.data("group-attr");
 		if( this.checked ){
-			jQuery("#updater-data :checkbox[data-group-attr='"+group+"']").removeAttr("checked");
+			jQuery(":checkbox[data-group-attr='"+group+"']", Dsc.MassUpdate.Elements.data_wrapper).removeAttr("checked");
 			$this.prop("checked", "true");
 		}
 	}
 
-	jQuery("#updater-data").on("change", ":checkbox", Dsc.MassUpdateHandleCheckboxSelectGroup);
-	jQuery("form#updater").on("focus", "input:not(:checkbox)", Dsc.MassUpdateHandleCheckboxSelectGroup);
-	
+	Dsc.MassUpdate.Elements.data_wrapper.on("change", ":checkbox", Dsc.MassUpdate.HandleCheckboxSelectGroup);
 });
 </script>
 
@@ -31,17 +159,14 @@ jQuery(function(){
 </div>
 
 
-<form id="updaters" class="updatersForm" action="./admin/massupdate/updater" method="post">
-	<div class="no-padding">
-		<div class="widget-body-toolbar">
-			<div class="row">
-		        <?php echo $this->renderLayout('MassUpdate/Admin/Views::updaters/list_toolbar.php'); ?>
-			</div>
+<div class="no-padding">
+	<div class="widget-body-toolbar">
+		<div class="row">
+	        <?php echo $this->renderLayout('MassUpdate/Admin/Views::updaters/list_toolbar.php'); ?>
 		</div>
-	</div>	
-	<div class="row" id="updater-data">
-		<?php echo \Dsc\Request::internal( "\MassUpdate\Admin\Controllers\Updaters->getUpdaterData", array( $selected_updater, $selected_model ) ); ?>
 	</div>
-	<hr />
-	
-</form>
+</div>	
+<hr />
+<div class="row" id="updater-data">
+	<?php echo \Dsc\Request::internal( "\MassUpdate\Admin\Controllers\Updaters->getUpdaterData", array( $selected_updater, $selected_model ) ); ?>
+</div>

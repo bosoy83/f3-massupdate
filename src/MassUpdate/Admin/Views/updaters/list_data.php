@@ -2,7 +2,7 @@
 	$attrs = $model->getUpdateOperationGroups();
 	$conditions = $model->getUpdateCondition
 ?>
-<form id="routes" class="searchForm" action="./admin/massupdate/updaters" method="post">	
+<form id="updaters" class="massupdaterForm" action="./admin/massupdate/updaters/<?php echo $selected_updater;?>/<?php echo $selected_model;?>" method="post">	
 	<div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 pull-left">
 	<h2>Attributes</h2>
 		<table class="table table-striped">

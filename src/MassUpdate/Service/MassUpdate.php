@@ -51,4 +51,34 @@ class MassUpdate extends \Prefab
 			return null;
 		}
 	}
+	
+	/**
+	 * Finds appropriate model in group of models
+	 * 
+	 * @param $slug		Slug for model
+	 * @param $group  	Group in which we want to look (either its slug or instane of it)
+	 * 
+	 * @return	Instance of model or null in case it wasnt found
+	 */
+	public function getModel( $slug, $group ){
+		if( empty( $slug ) || empty( $group ) ){
+			throw new \Exception("Missing parameters in MassUpdate service in method getModel");
+		} 
+		
+		if( is_string( $group ) ) {
+			$group = $this->getGroup( $group );
+		}
+		
+		$res = null;
+			// find selected model
+		if( count( $models = $group->getModels() ) > 0 ){
+			foreach( $models as $m ){
+				if( $m->getSlugMassUpdate() == $slug ){
+					$res = $m;
+					break;
+				}
+			}
+		}
+		return $res;
+	}
 }

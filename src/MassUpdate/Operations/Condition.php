@@ -2,10 +2,10 @@
 namespace MassUpdate\Operations;
 
 /**
- * Base class for all operations Update operations
+ * Base class for all Condition operations
  * 
  */
-abstract class Update implements \MassUpdate\Operations\Operation{
+abstract class Condition implements \MassUpdate\Operations\Operation{
 
 	/**
 	 * Name of attribute to which this operation is assigned
@@ -20,9 +20,9 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 
 	
 	/**
-	 * This method returns update clause which will be later on passed to collection
+	 * This method returns where clause which will be later on passed to collection
 	 */
-	public abstract function getUpdateClause($data);
+	public abstract function getWhereClause($data);
 		
 	/**
 	 * This method returns string representation how the operation should be rendered in form
@@ -60,5 +60,12 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 		
 		return $this;
 	}
+	
+	/**
+	 * This method returns nature of this operation - whether it uses mdoel's filter or generates its own where clause statement
+	 * 
+	 * @return True if it uses model's filter
+	 */
+	public abstract function getNatureOfOperation();
 }
 ?>

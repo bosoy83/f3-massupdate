@@ -8,7 +8,7 @@ namespace MassUpdate\Operations\Update;
 class IncreaseBy extends \MassUpdate\Operations\Update{
 
 	/**
-	 * This method returns update class which will be later on passed to db mapper
+	 * This method returns update clause which will be later on passed to collection
 	 */
 	public function getUpdateClause($data){
 		$data = $this->attribute->getInputFilter()->clean($data, "float");

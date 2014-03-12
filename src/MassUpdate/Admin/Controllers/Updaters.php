@@ -110,7 +110,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 	 */
 	private function processUpdatePart(  $selected_model ){
 		$updates = array();
-		$attr_groups = $selected_model->getUpdateOperationGroups();
+		$attr_groups = $selected_model->getMassUpdateOperationGroups();
 		$request = \Base::instance()->get('REQUEST');
 
 		if( count( $attr_groups ) > 0 ){
@@ -128,7 +128,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 				$opt = (int)$request[$attr_name.'_cb'][0];
 				$data = empty($request[$attr_name.'_'.$opt]) ? '' : $request[$attr_name.'_'.$opt];
 				// now we need to find operation with a proper index
-				$operations = $attr->getOperations();
+				$operations = $attr->getOperations('update');
 				if( empty( $operations[$opt] ) || !($operations[$opt] instanceof \MassUpdate\Operations\Update )) {
 					// something is not right with this attribute -> skip it
 					continue;

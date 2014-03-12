@@ -7,8 +7,8 @@ namespace MassUpdate\Service\Models;
  */
 interface MassUpdateOperations{
 	
-	/**
-	 * This method gets list of UpdateOperation groups
-	 */
-	public function getUpdateOperationGroups();
+    /**
+     * This method gets list of attribute groups with operations
+     */
+	public function getMassUpdateOperationGroups();
 }

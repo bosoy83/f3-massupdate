@@ -66,14 +66,18 @@ class AttributeGroup extends \Prefab
 	/**
 	 * This method adds operation into list of operations for this group
 	 * 
-	 * @param $op Instance of update operation
+	 * @param $op 		Instance of update operation
+	 * @param $type		Type of operation (so far, either Condition or Update)
 	 * 
 	 * @return Instance of this class in order to support chaining of operations
 	 */
-	public function addOperation( $op ){
+	public function addOperation( $op, $type ){
 		if( $op instanceof \MassUpdate\Operations\Operation ){
 			$op->setAttribute( $this );
-			$this->operations []= $op;
+			if( !isset( $this->operations[$type] ) ){
+				$this->operations[$type] = array();
+			}
+			$this->operations[$type] []= $op;
 		} else { // warn us, if we pass here instance of an unsupported object
 			throw new \Exception( "Unsupported Operation object" );
 		}
@@ -82,11 +86,16 @@ class AttributeGroup extends \Prefab
 	
 	/**
 	 * This method returns array of all operations for this group
+	 * @param $type		Type of operation (so far, either Condition or Update)
 	 * 
 	 * @return Array of all operations for this group
 	 */
-	public function getOperations(){
-		return $this->operations;
+	public function getOperations($type){
+		if( !isset($this->operations[$type] ) ){
+			return array();
+		} else {
+			return $this->operations[$type];
+		}
 	}
 	
 	/**

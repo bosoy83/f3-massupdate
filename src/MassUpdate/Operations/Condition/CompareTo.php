@@ -1,18 +1,19 @@
 <?php 
-namespace MassUpdate\Operations\Update;
+namespace MassUpdate\Operations\Condition;
 
 /**
- * Change value to this one
+ * Checks, if a field is equal to a content
  * 
  */
-class ChangeTo extends \MassUpdate\Operations\Update{
+class CompareTo extends \MassUpdate\Operations\Condition{
 
 	/**
-	 * This method returns update clause which will be later on passed to collection
+	 * This method returns where clause which will be later on passed to collection
 	 */
-	public function getUpdateClause($data){
+	public function getWhereClause($data){
 		$data = $this->attribute->getInputFilter()->clean($data, "alnum");
-		return array('$set', array( $this->attribute->getAttributeCollection() => $data ));
+//		return array('$set', array( $this->attribute->getAttributeCollection() => $data ));
+return array();
 	}
 	
 	/**
@@ -29,7 +30,16 @@ class ChangeTo extends \MassUpdate\Operations\Update{
 	 * operation in form
 	 */
 	public function getLabel(){
-		return "Change to this value";
+		return "Equals to";
+	}
+
+	/**
+	 * This method returns nature of this operation - whether it uses mdoel's filter or generates its own where clause statement
+	 * 
+	 * @return True if it uses model's filter
+	 */
+	public abstract function getNatureOfOperation(){
+		return false;
 	}
 }
 ?>

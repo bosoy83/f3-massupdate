@@ -12,8 +12,7 @@ class Contains extends \MassUpdate\Operations\Condition{
 	 */
 	public function getWhereClause($data){
 		$data = $this->attribute->getInputFilter()->clean($data, "alnum");
-//		return array('$set', array( $this->attribute->getAttributeCollection() => $data ));
-return array();
+		return array( $this->filter, $data );
 	}
 	
 	/**
@@ -38,7 +37,7 @@ return array();
 	 *
 	 * @return True if it uses model's filter
 	 */
-	public abstract function getNatureOfOperation(){
+	public function getNatureOfOperation(){
 		return true;
 	}
 }

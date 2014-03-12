@@ -38,7 +38,7 @@ return array();
 	 * 
 	 * @return True if it uses model's filter
 	 */
-	public abstract function getNatureOfOperation(){
+	public function getNatureOfOperation(){
 		return false;
 	}
 }

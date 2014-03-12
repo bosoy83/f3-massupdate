@@ -18,6 +18,10 @@ abstract class Condition implements \MassUpdate\Operations\Operation{
 	 */
 	protected $idx;
 
+	/**
+	 * Name of filter in model's state - in case this operation is using model's filters
+	 */
+	protected $filter;
 	
 	/**
 	 * This method returns where clause which will be later on passed to collection
@@ -67,5 +71,31 @@ abstract class Condition implements \MassUpdate\Operations\Operation{
 	 * @return True if it uses model's filter
 	 */
 	public abstract function getNatureOfOperation();
+	
+	/**
+	 * This method sets filter name for this operation
+	 * 
+	 * @param $newFilter	Filter for this operation
+	 * 
+	 * @return Instance of this class in order to support chaining of operations
+	 */
+	protected function setOperationFilter($newFilter){
+		$this->filter = $newFilter;
+	}
+
+	/**
+	 * This methods sets additional parameters for this operation
+	 * Note: For update operations, nothing by default
+	 *
+	 * @param $param 	Array with additional parameters
+	 */
+	public function setParams( $params ){
+		if( !empty( $params ) && is_array( $params ) ){
+			if($this->getNatureOfOperation() && isset( $params['filter'] ) ){
+				$this->setOperationFilter( $params['filter']);
+			}
+		}
+	}
+	
 }
 ?>

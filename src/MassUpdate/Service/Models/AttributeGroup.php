@@ -68,16 +68,20 @@ class AttributeGroup extends \Prefab
 	 * 
 	 * @param $op 		Instance of update operation
 	 * @param $type		Type of operation (so far, either Condition or Update)
+	 * @param $params	Parameters which can be passed to operations during adding prcess
 	 * 
 	 * @return Instance of this class in order to support chaining of operations
 	 */
-	public function addOperation( $op, $type ){
+	public function addOperation( $op, $type, $params = array() ){
 		if( $op instanceof \MassUpdate\Operations\Operation ){
 			$op->setAttribute( $this );
 			if( !isset( $this->operations[$type] ) ){
 				$this->operations[$type] = array();
 			}
 			$this->operations[$type] []= $op;
+			$op->setParams( $params );
+			
+			
 		} else { // warn us, if we pass here instance of an unsupported object
 			throw new \Exception( "Unsupported Operation object" );
 		}

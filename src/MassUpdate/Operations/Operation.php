@@ -35,5 +35,12 @@ interface Operation{
 	 * @return Instance of this class in order to support chaining of operations
 	 */
 	public function setIndex($index);
+
+	/**
+	 * This methods sets additional parameters for this operation
+	 * 
+	 * @param $param 	Array with additional parameters
+	 */
+	public function setParams( $params );
 }
 ?>

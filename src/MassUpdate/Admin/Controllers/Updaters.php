@@ -96,8 +96,11 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		}
 		
 		$update_part = $this->processUpdatePart( $selected_model );
+		$where_part_raw = $this->processWherePart( $selected_model );
+		$where_part = $this->mergeWhereClauseWithFilters( $service );
 		$collection = $selected_model->collection();
-		$collection->update( array(  ), $update_part, array("multiple" => true  ) );
+		
+		$collection->update( $where_part, $update_part, array("multiple" => true  ) );
 		echo $this->getListHtml( $updater, $model_name );
 	}
 	
@@ -106,7 +109,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 	 * 
 	 * @param $selected_model	Instance of model
 	 * 
-	 * @return	array of sanitized update commands for mapper
+	 * @return	array of sanitized update commands for collection
 	 */
 	private function processUpdatePart(  $selected_model ){
 		$updates = array();
@@ -119,13 +122,14 @@ class Updaters extends \Admin\Controllers\BaseAuth
 				$attr_name = str_replace('.', '_', $attr->getAttributeCollection());
 				
 				// make sure we have at least some information about this attribute
-				if( !isset( $request[$attr_name.'_cb'] ) || 
-						is_array($request[$attr_name.'_cb']) == false ||
-					!isset($request[$attr_name.'_cb'][0])  ){
+				if( !isset( $request[$attr_name.'_update_cb'] ) || 
+						is_array($request[$attr_name.'_update_cb']) == false ||
+					!isset($request[$attr_name.'_update_cb'][0])  ){
 					// something is not right with this attribute -> skip it
 					continue;
 				}
-				$opt = (int)$request[$attr_name.'_cb'][0];
+
+				$opt = (int)$request[$attr_name.'_update_cb'][0];
 				$data = empty($request[$attr_name.'_'.$opt]) ? '' : $request[$attr_name.'_'.$opt];
 				// now we need to find operation with a proper index
 				$operations = $attr->getOperations('update');
@@ -141,6 +145,50 @@ class Updaters extends \Admin\Controllers\BaseAuth
 			}
 		}
 
+		return $updates;
+	}
+	
+	/**
+	 * This method takes out only important data from request, sanitise them via Operations and returns them back to controller for furtner processing
+	 *
+	 * @param $selected_model	Instance of model
+	 *
+	 * @return	array of sanitized where commands for collection
+	 */
+	private function processWherePart(  $selected_model ){
+		$updates = array();
+		$attr_groups = $selected_model->getMassUpdateOperationGroups();
+		$request = \Base::instance()->get('REQUEST');
+	
+		if( count( $attr_groups ) > 0 ){
+			foreach( $attr_groups as $attr ){
+				// replace all dots with underscores
+				$attr_name = str_replace('.', '_', $attr->getAttributeCollection());
+	
+				// make sure we have at least some information about this attribute
+				if( !isset( $request[$attr_name.'_update_cb'] ) ||
+				is_array($request[$attr_name.'_update_cb']) == false ||
+				!isset($request[$attr_name.'_update_cb'][0])  ){
+					// something is not right with this attribute -> skip it
+					continue;
+				}
+	
+				$opt = (int)$request[$attr_name.'_update_cb'][0];
+				$data = empty($request[$attr_name.'_'.$opt]) ? '' : $request[$attr_name.'_'.$opt];
+				// now we need to find operation with a proper index
+				$operations = $attr->getOperations('update');
+				if( empty( $operations[$opt] ) || !($operations[$opt] instanceof \MassUpdate\Operations\Update )) {
+					// something is not right with this attribute -> skip it
+					continue;
+				}
+				$clause = $operations[$opt]->getUpdateClause( $data );
+				if( !isset( $updates[$clause[0]] ) ){
+					$updates[$clause[0]] = array();
+				}
+				$updates[$clause[0]] = $clause[1] + $updates[$clause[0]];
+			}
+		}
+	
 		return $updates;
 	}
 }

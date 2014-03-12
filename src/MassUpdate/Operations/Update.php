@@ -60,5 +60,13 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 		
 		return $this;
 	}
+
+	/**
+	 * This methods sets additional parameters for this operation
+	 * Note: For update operations, nothing by default
+	 *
+	 * @param $param 	Array with additional parameters
+	 */
+	public function setParams( $params ){}
 }
 ?>

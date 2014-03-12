@@ -15,7 +15,7 @@
 <div class="col-xs-10 col-sm-6 col-md-6 col-lg-8">
 	<div class="form-group pull-right">
 		<div class="input-group">
-			<button id="perform-update" class="form-control">Perform</button>
+			<button id="perform-update" class="btn btn-danger">Perform</button>
 		</div>
 	</div>
 </div>

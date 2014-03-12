@@ -21,7 +21,7 @@ class Contains extends \MassUpdate\Operations\Condition{
 	public function getFormHtml(){
 		$name = $this->attribute->getAttributeCollection();
 		
-		return "<input name=\"".$name."_".$this->idx."\" class=\"form-control\" value=\"\" id=\"".$name."_".$this->idx."\" placeholder=\"".$this->getLabel()."\" type=\"text\" />";
+		return "<input name=\"".$name."_".$this->getTypeString()."_".$this->idx."\" class=\"form-control\" value=\"\" id=\"".$name."_".$this->getTypeString()."_".$this->idx."\" placeholder=\"".$this->getLabel()."\" type=\"text\" />";
 	}
 	
 	/**

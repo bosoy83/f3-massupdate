@@ -103,7 +103,48 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		$collection->update( $where_part, $update_part, array("multiple" => true  ) );
 		echo $this->getListHtml( $updater, $model_name );
 	}
+
+	/**
+	 * This method takes out only important data from request, sanitise them via Operations and returns them back to controller for furtner processing
+	 *
+	 * @param $selected_model	Instance of model
+	 * @param $type				Type of operation
+	 *
+	 * @return	array of sanitized update commands for collection
+	 */
+	private function processSpecificPart(  $selected_model, $type ){
+		$result = array();
+		$attr_groups = $selected_model->getMassUpdateOperationGroups();
+		$request = \Base::instance()->get('REQUEST');
 	
+		if( count( $attr_groups ) > 0 ){
+			foreach( $attr_groups as $attr ){
+				// replace all dots with underscores
+				$attr_name = str_replace('.', '_', $attr->getAttributeCollection());
+	
+				// make sure we have at least some information about this attribute
+				if( !isset( $request[$attr_name.'_update_cb'] ) ||
+				is_array($request[$attr_name.'_'.$type.'_cb']) == false ||
+				!isset($request[$attr_name.'_'.$type.'_cb'][0])  ){
+					// something is not right with this attribute -> skip it
+					continue;
+				}
+	
+				$opt = (int)$request[$attr_name.'_'.$type.'_cb'][0];
+				$data = empty($request[$attr_name.'_'.$type.'_'.$opt]) ? '' : $request[$attr_name.'_'.$type.'_'.$opt];
+				// now we need to find operation with a proper index
+				$operations = $attr->getOperations($type);
+				if( empty( $operations[$opt] ) || !($operations[$opt] instanceof \MassUpdate\Operations\Update )) {
+					// something is not right with this attribute -> skip it
+					continue;
+				}
+				$result []= array( $operations[$opt], $data );
+			}
+		}
+	
+		return $result;
+	}
+
 	/**
 	 * This method takes out only important data from request, sanitise them via Operations and returns them back to controller for furtner processing
 	 * 
@@ -113,38 +154,17 @@ class Updaters extends \Admin\Controllers\BaseAuth
 	 */
 	private function processUpdatePart(  $selected_model ){
 		$updates = array();
-		$attr_groups = $selected_model->getMassUpdateOperationGroups();
-		$request = \Base::instance()->get('REQUEST');
-
-		if( count( $attr_groups ) > 0 ){
-			foreach( $attr_groups as $attr ){
-				// replace all dots with underscores
-				$attr_name = str_replace('.', '_', $attr->getAttributeCollection());
-				
-				// make sure we have at least some information about this attribute
-				if( !isset( $request[$attr_name.'_update_cb'] ) || 
-						is_array($request[$attr_name.'_update_cb']) == false ||
-					!isset($request[$attr_name.'_update_cb'][0])  ){
-					// something is not right with this attribute -> skip it
-					continue;
-				}
-
-				$opt = (int)$request[$attr_name.'_update_cb'][0];
-				$data = empty($request[$attr_name.'_'.$opt]) ? '' : $request[$attr_name.'_'.$opt];
-				// now we need to find operation with a proper index
-				$operations = $attr->getOperations('update');
-				if( empty( $operations[$opt] ) || !($operations[$opt] instanceof \MassUpdate\Operations\Update )) {
-					// something is not right with this attribute -> skip it
-					continue;
-				}
-				$clause = $operations[$opt]->getUpdateClause( $data );
+		$update_data = $this->processSpecificPart( $selected_model, "update" );
+		if( count( $update_data ) > 0 ){
+			foreach( $update_data as $row ){
+				$clause = $row[0]->getUpdateClause( $row[1] );
 				if( !isset( $updates[$clause[0]] ) ){
 					$updates[$clause[0]] = array();
 				}
 				$updates[$clause[0]] = $clause[1] + $updates[$clause[0]];
 			}
 		}
-
+	
 		return $updates;
 	}
 	
@@ -156,39 +176,42 @@ class Updaters extends \Admin\Controllers\BaseAuth
 	 * @return	array of sanitized where commands for collection
 	 */
 	private function processWherePart(  $selected_model ){
-		$updates = array();
-		$attr_groups = $selected_model->getMassUpdateOperationGroups();
-		$request = \Base::instance()->get('REQUEST');
-	
-		if( count( $attr_groups ) > 0 ){
-			foreach( $attr_groups as $attr ){
-				// replace all dots with underscores
-				$attr_name = str_replace('.', '_', $attr->getAttributeCollection());
-	
-				// make sure we have at least some information about this attribute
-				if( !isset( $request[$attr_name.'_update_cb'] ) ||
-				is_array($request[$attr_name.'_update_cb']) == false ||
-				!isset($request[$attr_name.'_update_cb'][0])  ){
-					// something is not right with this attribute -> skip it
-					continue;
+		$conditions = array();
+		$conditions_data = $this->processSpecificPart( $selected_model, "where" );
+		$state  = $selected_model->emptyState()->populateState()->getState();
+
+		if( count( $conditions_data ) > 0 ){
+			foreach( $conditions_data as $row ){
+				$clause = $row[0]->getWhereClause( $row[1] );
+				
+				if( $row[0]->getNatureOfOperation() ){ // if this operation works with model filter
+					
+				} else { // nope, it has its own condition
+					
 				}
-	
-				$opt = (int)$request[$attr_name.'_update_cb'][0];
-				$data = empty($request[$attr_name.'_'.$opt]) ? '' : $request[$attr_name.'_'.$opt];
-				// now we need to find operation with a proper index
-				$operations = $attr->getOperations('update');
-				if( empty( $operations[$opt] ) || !($operations[$opt] instanceof \MassUpdate\Operations\Update )) {
-					// something is not right with this attribute -> skip it
-					continue;
-				}
-				$clause = $operations[$opt]->getUpdateClause( $data );
+				
 				if( !isset( $updates[$clause[0]] ) ){
 					$updates[$clause[0]] = array();
 				}
 				$updates[$clause[0]] = $clause[1] + $updates[$clause[0]];
 			}
 		}
+		
+		// now, we should union specified conditions with the one used via filters
 	
 		return $updates;
+	}
+
+	/**
+	 * Method for HMVC request to render table with operations of one type
+	 * 
+	 * @param $attributes 	Array with all attributes having operations
+	 * @param $type			Type of operation that is being rendered
+	 */
+	public function getOperationsTableHtml($attributes, $type ){
+		$f3 = \Base::instance();
+		$f3->set('attributes',$attributes);	
+		$f3->set('type',$type);	
+		echo \Dsc\System::instance()->get('theme')->renderLayout('MassUpdate/Admin/Views::updaters/list_operations.php');
 	}
 }

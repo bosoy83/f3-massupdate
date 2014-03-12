@@ -42,5 +42,12 @@ interface Operation{
 	 * @param $param 	Array with additional parameters
 	 */
 	public function setParams( $params );
+
+	/**
+	 * This method returns string representation of type of the operation
+	 * 
+	 * @return String representation of type of the operation (where or update)
+	 */
+	public function getTypeString();
 }
 ?>

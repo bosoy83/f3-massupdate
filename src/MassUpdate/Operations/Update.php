@@ -8,6 +8,11 @@ namespace MassUpdate\Operations;
 abstract class Update implements \MassUpdate\Operations\Operation{
 
 	/**
+	 * Type of this operation
+	 */
+	protected $type = 'update';
+	
+	/**
 	 * Name of attribute to which this operation is assigned
 	 */
 	protected $attribute;
@@ -68,5 +73,16 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 	 * @param $param 	Array with additional parameters
 	 */
 	public function setParams( $params ){}
+
+
+	/**
+	 * This method returns string representation of type of the operation
+	 *
+	 * @return String representation of type of the operation (where or update)
+	 */
+	public function getTypeString(){
+		return $this->type;
+	}
+	
 }
 ?>

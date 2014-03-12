@@ -134,7 +134,6 @@ jQuery(function(){
 	Dsc.MassUpdate.HandleCheckboxSelectGroup = function(event){
 		$this = jQuery(event.currentTarget);
 
-		console.log(event.currentTarget);
 		var group = $this.data("group-attr");
 		if( this.checked ){
 			jQuery(":checkbox[data-group-attr='"+group+"']", Dsc.MassUpdate.Elements.data_wrapper).removeAttr("checked");

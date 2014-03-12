@@ -6,7 +6,12 @@ namespace MassUpdate\Operations;
  * 
  */
 abstract class Condition implements \MassUpdate\Operations\Operation{
-
+	
+	/**
+	 * Type of this operation
+	 */
+	protected $type = 'where';
+	
 	/**
 	 * Name of attribute to which this operation is assigned
 	 */
@@ -97,5 +102,14 @@ abstract class Condition implements \MassUpdate\Operations\Operation{
 		}
 	}
 	
+
+	/**
+	 * This method returns string representation of type of the operation
+	 * 
+	 * @return String representation of type of the operation (where or update)
+	 */
+	public function getTypeString(){
+		return $this->type;
+	}
 }
 ?>

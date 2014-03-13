@@ -44,7 +44,7 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 	public abstract function getFormHtml();
 	
 	/**
-	 * This method attribute for this operation
+	 * This method sets attribute for this operation
 	 * 
 	 * @param $attr		Attribute in collection
 	 * 
@@ -54,6 +54,15 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 		$this->attribute = $attr;
 		
 		return $this;
+	}
+
+	/**
+	 * This method returns attribute for this operation
+	 *
+	 * @return Attribute for this operation
+	 */
+	public function getAttribute(){
+		return $this->attribute;
 	}
 	
 	/**
@@ -83,7 +92,6 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 	 */
 	public function setParams( $params ){
 	}
-
 
 	/**
 	 * This method returns string representation of type of the operation

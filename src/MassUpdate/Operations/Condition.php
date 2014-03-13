@@ -39,7 +39,7 @@ abstract class Condition implements \MassUpdate\Operations\Operation{
 	public abstract function getFormHtml();
 	
 	/**
-	 * This method attribute for this operation
+	 * This method sets attribute for this operation
 	 * 
 	 * @param $attr		Attribute in collection
 	 * 

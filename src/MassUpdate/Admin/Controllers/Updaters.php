@@ -3,6 +3,7 @@ namespace MassUpdate\Admin\Controllers;
 
 class Updaters extends \Admin\Controllers\BaseAuth
 {
+	
 	public function index()
 	{
 		$f3 = \Base::instance();
@@ -94,20 +95,116 @@ class Updaters extends \Admin\Controllers\BaseAuth
 			echo $this->getListHtml( "", "" );
 			return;
 		}
-		
-		$update_part = $this->processUpdatePart( $selected_model );
 		$where_part = $this->processWherePart( $selected_model );
+		$update_operations = $this->processSpecificPart( $selected_model, "update" );
 		$collection = $selected_model->collection();
 		
-		$collection->update( $where_part, $update_part, array("multiple" => true  ) );
-		$stats = \Dsc\System::instance()->get("mongo")->lastError();
-		if( empty( $stats['err'] ) && isset( $stats['ok'] ) && $stats['ok'] == 1 ){
-			\Dsc\System::instance()->addMessage( $stats['n']." record(s) were successfully updated!" );
-		} else {
-			\Dsc\System::instance()->addMessage( "An error has occured during the mass update", "error" );
-			\Dsc\System::instance()->addMessage( \Dsc\Debug::dump( $stats ), "error" );
+		$model_settings = $this->getModel();
+		$settings = $model_settings->populateState()->getItem();
+		$mode = $settings['general.updater_mode'];
+		
+		// check, if the update can be performed (if all update operations are OK with this mode)
+		$complains = array(); // array of all update operations complaining about mode
+		if( count( $update_operations ) > 0 ){
+			foreach ( $update_operations as $op_data ){
+				$requirement = $op_data[0]->getRequiredMode();
+				if( $requirement == -1 || $requirement == $mode ){
+					// so far, we're cool
+					continue;
+				}
+				// nope, start complaining like a girl NOW!
+				$complains []= $op_data[0];
+			}
 		}
+		
+		if( count( $complains ) > 0 ){
+			// we have operations complaing about the mode => notify user and do nothing
+			foreach( $complains as $op ){
+				$msg  = 'Update operation "'.$op->getLabel().'" in attribute "'.$op->getAttribute()->getAttributeTitle().'".';
+				$msg .= ' This operations requires mode with code '.$op->getRequiredMode().' If you wish to switch to this mode, click on ';
+				$msg .= ' <a href="#" class="link_updater_mode_settings" data-updater-mode="'.$op->getRequiredMode().'" >following link</a>';
+				
+				\Dsc\System::instance()->addMessage( $msg, "error" );
+			}
+		} else {
+			// handle the update
+			$res = array();
+			if( $mode == 1 ){ // document-by-document
+				$res = $this->handleDocumentByDocument( $selected_model, $where_part, $update_operations, $collection );
+			} else { // bulk update
+				$res = $this->handleBulkUpdate( $selected_model, $where_part, $update_operations, $collection );
+			}
+			
+			// process results
+			if( $res['error'] ){
+				\Dsc\System::instance()->addMessage( "An error has occured during the mass update", "error" );
+				\Dsc\System::instance()->addMessage( $res['error_msg'], "error" );
+			} else {
+				\Dsc\System::instance()->addMessage( $res['records']." record(s) were successfully updated!" );
+			}
+		}
+
 		echo $this->getListHtml( $updater, $model_name );
+	}
+	
+	/**
+	 * This method handles bulk update
+	 * 
+	 * @param $selected_model 	Selected model to be updated
+	 * @param $where_part		Array of condition operations
+	 * @param $update_data		Array of update operations
+	 * @param $collection		Collection to be updated
+	 * 
+	 * @return Result of this operation
+	 */
+	private function handleBulkUpdate($selected_model, $where_part, $update_data, $collection ){
+		$update_part = array();
+		if( count( $update_data ) > 0 ){
+			foreach( $update_data as $row ){
+				$clause = $row[0]->getUpdateClause( $row[1] );
+				if( !isset( $updates[$clause[0]] ) ){
+					$update_part[$clause[0]] = array();
+				}
+				$update_part[$clause[0]] = $clause[1] + $update_part[$clause[0]];
+			}
+		}
+		$collection->update( $where_part, $update_part, array("multiple" => true  ) );
+		
+		// process results
+		$stats = \Dsc\System::instance()->get("mongo")->lastError();
+		$res = array(
+			'records' => 0,
+			'error' => false,
+			'error_msg' => ""
+		);
+		if( empty( $stats['err'] ) && isset( $stats['ok'] ) && $stats['ok'] == 1 ){
+			$res['records'] = $stats['n'];
+		} else {
+			$res['error'] = true;
+			$res['error_msg'] = \Dsc\Debug::dump( $stats );
+		}
+		
+		return $res;
+	}
+	
+	/**
+	 * This method handles document-by-document
+	 * 
+	 * @param $selected_model 	Selected model to be updated
+	 * @param $where_part		Array of condition operations
+	 * @param $update_data		Array of update operations
+	 * @param $collection		Collection to be updated
+	 * 
+	 * @return Result of this operation
+	 */
+	private function handleDocumentByDocument( $selected_model, $where_part, $update_data, $collection ){
+		$res = array(
+				'records' => 0,
+				'error' => true,
+				'error_msg' => "Not implemented yet"
+		);
+		
+		return;
 	}
 
 	/**
@@ -149,29 +246,6 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		}
 	
 		return $result;
-	}
-
-	/**
-	 * This method takes out only important data from request, sanitise them via Operations and returns them back to controller for furtner processing
-	 * 
-	 * @param $selected_model	Instance of model
-	 * 
-	 * @return	array of sanitized update commands for collection
-	 */
-	private function processUpdatePart(  $selected_model ){
-		$updates = array();
-		$update_data = $this->processSpecificPart( $selected_model, "update" );
-		if( count( $update_data ) > 0 ){
-			foreach( $update_data as $row ){
-				$clause = $row[0]->getUpdateClause( $row[1] );
-				if( !isset( $updates[$clause[0]] ) ){
-					$updates[$clause[0]] = array();
-				}
-				$updates[$clause[0]] = $clause[1] + $updates[$clause[0]];
-			}
-		}
-	
-		return $updates;
 	}
 	
 	/**
@@ -225,5 +299,23 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		$f3->set('attributes',$attributes);	
 		$f3->set('type',$type);	
 		echo \Dsc\System::instance()->get('theme')->renderLayout('MassUpdate/Admin/Views::updaters/list_operations.php');
+	}
+	
+	/**
+	 * Returns approprate model
+	 * 
+	 * @param $type		Name of model
+	 * 
+	 * @return Instance of model
+	 */
+	public function getModel( $type = "settings" ){
+		$model = null;
+		switch( $type ){
+			case "settings":
+				// get current mode from Settings model
+				$model = new \MassUpdate\Admin\Models\Settings;
+				break;
+		}
+		return $model;
 	}
 }

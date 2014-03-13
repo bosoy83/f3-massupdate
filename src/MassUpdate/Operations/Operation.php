@@ -13,7 +13,7 @@ interface Operation{
 	public function getFormHtml();
 	
 	/**
-	 * This method attribute for this operation
+	 * This method sets attribute for this operation
 	 * 
 	 * @param $attr		Attribute in collection
 	 * 

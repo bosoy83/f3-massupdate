@@ -11,6 +11,11 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 	 * Type of this operation
 	 */
 	protected $type = 'update';
+
+	/**
+	 * Mode of updater
+	 */
+	protected $updater_mode = 0;
 	
 	/**
 	 * Name of attribute to which this operation is assigned
@@ -22,12 +27,16 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 	 * update opetions in one group)
 	 */
 	protected $idx;
-
 	
 	/**
 	 * This method returns update clause which will be later on passed to collection
+	 * 
+	 * @param 	$data		Data from request
+	 * @param	$params		Arrays with possible additional params (for different modes of updater
+	 * 
+	 * @return	Based on mode of updater, either update clause or updated document
 	 */
-	public abstract function getUpdateClause($data);
+	public abstract function getUpdateClause($data, $params = array() );
 		
 	/**
 	 * This method returns string representation how the operation should be rendered in form
@@ -72,7 +81,8 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 	 *
 	 * @param $param 	Array with additional parameters
 	 */
-	public function setParams( $params ){}
+	public function setParams( $params ){
+	}
 
 
 	/**
@@ -84,5 +94,23 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 		return $this->type;
 	}
 	
+	/**
+	 * Gets updater mode which this operation requires
+	 * Note: -1 means that it doesnt matter for it
+	 * 
+	 * @return Number of mode
+	 */
+	public function getRequiredMode(){
+		return -1;
+	}
+	
+	/**
+	 * This method sets updater mode for this operation
+	 * 
+	 * @param $mode		Current updater mode
+	 */
+	public function setUpdaterMode($mode){
+		$this->updater_mode = $mode;
+	}
 }
 ?>

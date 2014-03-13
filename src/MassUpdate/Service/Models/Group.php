@@ -19,17 +19,34 @@ abstract class Group extends \Prefab
 	
 	/**
 	 * Initialize list of models
+	 * 
+	 * @param	$mode	Mode of updater
 	 */
-	public abstract function initialize();
+	public abstract function initialize($mode);
 	
 	/**
 	 * Adds a model into group
 	 * 
 	 * @param $model Model to be added into the group
+	 * @param	$mode	Mode of updater
+	 * 
 	 * @return Instance of this class to support chaining of commands
 	 */
-	protected function addModel( $model ){
+	protected function addModel( $model, $mode ){
 		$this->models []= $model;
+		$attributes = $model->getMassUpdateOperationGroups();
+		
+		// set mode for all update operations
+		if( count( $attributes ) ){
+			foreach( $attributes as $attr ){
+				$operations = $attr->getOperations( "update" );
+				if( count( $operations ) ){
+					foreach( $operations as $op ){
+						$op->setUpdaterMode( $mode );
+					}
+				}
+			}
+		}
 		return $this;
 	}
 	

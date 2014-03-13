@@ -22,10 +22,14 @@ class MassUpdate extends \Prefab
 		if( $this->initialized ){
 			return;
 		}
+		
+		// get current mode from Settings model
+		$settings = new \MassUpdate\Admin\Models\Settings;
+		$current_settings = $settings->populateState()->getItem();
 
 		if( count( $this->list_groups ) > 0 ){
 			foreach( $this->list_groups as $group ){
-				$group->initialize();
+				$group->initialize($current_settings['general.updater_mode']);
 			}
 		}
 		$this->initialized = true;

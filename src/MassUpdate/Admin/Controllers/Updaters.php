@@ -100,6 +100,13 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		$collection = $selected_model->collection();
 		
 		$collection->update( $where_part, $update_part, array("multiple" => true  ) );
+		$stats = \Dsc\System::instance()->get("mongo")->lastError();
+		if( empty( $stats['err'] ) && isset( $stats['ok'] ) && $stats['ok'] == 1 ){
+			\Dsc\System::instance()->addMessage( $stats['n']." record(s) were successfully updated!" );
+		} else {
+			\Dsc\System::instance()->addMessage( "An error has occured during the mass update", "error" );
+			\Dsc\System::instance()->addMessage( \Dsc\Debug::dump( $stats ), "error" );
+		}
 		echo $this->getListHtml( $updater, $model_name );
 	}
 

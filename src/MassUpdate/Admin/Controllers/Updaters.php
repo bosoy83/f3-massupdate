@@ -128,19 +128,23 @@ class Updaters extends \Admin\Controllers\BaseAuth
 			}
 		} else {
 			// handle the update
-			$res = array();
-			if( $mode == 1 ){ // document-by-document
-				$res = $this->handleDocumentByDocument( $selected_model, $where_part, $update_operations, $collection );
-			} else { // bulk update
-				$res = $this->handleBulkUpdate( $selected_model, $where_part, $update_operations, $collection );
-			}
-			
-			// process results
-			if( $res['error'] ){
-				\Dsc\System::instance()->addMessage( "An error has occured during the mass update", "error" );
-				\Dsc\System::instance()->addMessage( $res['error_msg'], "error" );
+			if( count( $update_operations ) > 0 ){
+				$res = array();
+				if( $mode == 1 ){ // document-by-document
+					$res = $this->handleDocumentByDocument( $selected_model, $where_part, $update_operations, $collection );
+				} else { // bulk update
+					$res = $this->handleBulkUpdate( $selected_model, $where_part, $update_operations, $collection );
+				}
+					
+				// process results
+				if( $res['error'] ){
+					\Dsc\System::instance()->addMessage( "An error has occured during the mass update", "error" );
+					\Dsc\System::instance()->addMessage( $res['error_msg'], "error" );
+				} else {
+					\Dsc\System::instance()->addMessage( $res['records']." record(s) were successfully updated!" );
+				}
 			} else {
-				\Dsc\System::instance()->addMessage( $res['records']." record(s) were successfully updated!" );
+				\Dsc\System::instance()->addMessage( "No operation for update was selected!" );
 			}
 		}
 
@@ -198,13 +202,36 @@ class Updaters extends \Admin\Controllers\BaseAuth
 	 * @return Result of this operation
 	 */
 	private function handleDocumentByDocument( $selected_model, $where_part, $update_data, $collection ){
+		
 		$res = array(
 				'records' => 0,
 				'error' => true,
 				'error_msg' => "Not implemented yet"
 		);
 		
-		return;
+		$cursor = $collection->find( $where_part );
+		
+		$num = 0;
+		foreach( $cursor as $doc ){
+			$selected_model->bind( $doc );
+			
+			foreach( $update_data as $op ){
+				$selected_model = $op[0]->getUpdateClause( $op[1], array( 'document' => $selected_model ));
+			}
+
+			$collection->update(
+                			array('_id'=> new \MongoId((string) $selected_model->get('id') ) ),
+                			$selected_model->cast(),
+					   		array('upsert'=>false, 'multiple'=>false)
+					);
+			$num++;
+		}
+		$res = array(
+			'records' => $num,
+			'error' => false,
+			'error_msg' => ""
+		);
+		return $res;
 	}
 
 	/**

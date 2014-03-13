@@ -22,6 +22,11 @@ class AttributeGroup extends \Prefab
 	protected $operations = array();
 
 	/**
+	 * Mode of updater
+	 */
+	protected $updater_mode;
+	
+	/**
 	 * This method sets name of attribute in collection for this group of operations
 	 * 
 	 * @param $attr Name in collection
@@ -109,5 +114,18 @@ class AttributeGroup extends \Prefab
 	 */
 	public function getInputFilter(){
 		return \Dsc\System::instance()->get('inputfilter');
+	}
+	
+	/**
+	 * This method sets updater mode for this operation
+	 * 
+	 * @param $mode		Current updater mode
+	 */
+	public function setUpdaterMode($mode){
+		$this->updater_mode = $mode;
+	}
+	
+	public function getUpdaterMode(){
+		return $this->updater_mode;
 	}
 }

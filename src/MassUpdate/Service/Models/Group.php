@@ -39,12 +39,7 @@ abstract class Group extends \Prefab
 		// set mode for all update operations
 		if( count( $attributes ) ){
 			foreach( $attributes as $attr ){
-				$operations = $attr->getOperations( "update" );
-				if( count( $operations ) ){
-					foreach( $operations as $op ){
-						$op->setUpdaterMode( $mode );
-					}
-				}
+				$attr->setUpdaterMode( $mode );
 			}
 		}
 		return $this;

@@ -18,7 +18,7 @@ class IncreaseBy extends \MassUpdate\Operations\Update{
 	public function getUpdateClause($data, $params = array()){
 		$data = $this->attribute->getInputFilter()->clean($data, "float");
 			
-		switch( $this->updater_mode ){
+		switch( $this->attribute->getUpdaterMode() ){
 			case 0: // buk update
 				{
 					return array('$inc', $this->attribute->getAttributeCollection().' = '.$data );

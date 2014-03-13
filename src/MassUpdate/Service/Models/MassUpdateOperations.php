@@ -9,6 +9,8 @@ interface MassUpdateOperations{
 	
     /**
      * This method gets list of attribute groups with operations
+     * 
+     * @return	Array with attribute groups
      */
 	public function getMassUpdateOperationGroups();
 }

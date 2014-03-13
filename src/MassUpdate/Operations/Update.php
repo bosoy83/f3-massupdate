@@ -15,7 +15,7 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 	/**
 	 * Mode of updater
 	 */
-	protected $updater_mode = 0;
+	protected $updater_mode;
 	
 	/**
 	 * Name of attribute to which this operation is assigned
@@ -110,15 +110,6 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 	 */
 	public function getRequiredMode(){
 		return -1;
-	}
-	
-	/**
-	 * This method sets updater mode for this operation
-	 * 
-	 * @param $mode		Current updater mode
-	 */
-	public function setUpdaterMode($mode){
-		$this->updater_mode = $mode;
 	}
 }
 ?>

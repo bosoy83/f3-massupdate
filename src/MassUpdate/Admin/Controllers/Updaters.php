@@ -209,7 +209,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 			foreach($filters as $filter ){
 				$state->set('filter.'.$filter[0], $filter[1]);
 			}
-			$conditions = $state->conditions() + $conditions;
+			$conditions = $selected_model->conditions() + $conditions;
 		}
 		return $conditions;
 	}

@@ -15,6 +15,7 @@ class Listener extends \Prefab
             $mapper->icon = 'fa fa-signal';
             $mapper->children = array(
                     json_decode(json_encode(array( 'title'=>'List Updaters', 'route'=>'/admin/massupdate/updaters', 'icon'=>'fa fa-list' )))
+                    ,json_decode(json_encode(array( 'title'=>'Settings', 'route'=>'/admin/massupdate/settings', 'icon'=>'fa fa-cogs' )))
             );
             $mapper->save();
             

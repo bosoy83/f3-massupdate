@@ -2,18 +2,17 @@
 namespace MassUpdate\Operations\Condition;
 
 /**
- * Checks, if a field is equal to a content
+ * Checks, if a field is equal to a content (no regexps in condition)
  * 
  */
-class CompareTo extends \MassUpdate\Operations\Condition{
+class EqualsTo extends \MassUpdate\Operations\Condition{
 
 	/**
 	 * This method returns where clause which will be later on passed to collection
 	 */
 	public function getWhereClause($data){
 		$data = $this->attribute->getInputFilter()->clean($data, "alnum");
-//		return array('$set', array( $this->attribute->getAttributeCollection() => $data ));
-return array();
+		return array($this->attribute->getAttributeCollection(), $data );
 	}
 	
 	/**
@@ -30,7 +29,7 @@ return array();
 	 * operation in form
 	 */
 	public function getLabel(){
-		return "The content is";
+		return "Equals to";
 	}
 
 	/**

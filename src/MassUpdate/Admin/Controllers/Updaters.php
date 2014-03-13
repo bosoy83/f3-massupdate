@@ -96,8 +96,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		}
 		
 		$update_part = $this->processUpdatePart( $selected_model );
-		$where_part_raw = $this->processWherePart( $selected_model );
-		$where_part = $this->mergeWhereClauseWithFilters( $service );
+		$where_part = $this->processWherePart( $selected_model );
 		$collection = $selected_model->collection();
 		
 		$collection->update( $where_part, $update_part, array("multiple" => true  ) );
@@ -123,7 +122,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 				$attr_name = str_replace('.', '_', $attr->getAttributeCollection());
 	
 				// make sure we have at least some information about this attribute
-				if( !isset( $request[$attr_name.'_update_cb'] ) ||
+				if( !isset( $request[$attr_name.'_'.$type.'_cb'] ) ||
 				is_array($request[$attr_name.'_'.$type.'_cb']) == false ||
 				!isset($request[$attr_name.'_'.$type.'_cb'][0])  ){
 					// something is not right with this attribute -> skip it
@@ -134,7 +133,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 				$data = empty($request[$attr_name.'_'.$type.'_'.$opt]) ? '' : $request[$attr_name.'_'.$type.'_'.$opt];
 				// now we need to find operation with a proper index
 				$operations = $attr->getOperations($type);
-				if( empty( $operations[$opt] ) || !($operations[$opt] instanceof \MassUpdate\Operations\Update )) {
+				if( empty( $operations[$opt] ) || !($operations[$opt] instanceof \MassUpdate\Operations\Operation )) {
 					// something is not right with this attribute -> skip it
 					continue;
 				}
@@ -177,29 +176,35 @@ class Updaters extends \Admin\Controllers\BaseAuth
 	 */
 	private function processWherePart(  $selected_model ){
 		$conditions = array();
+		$filters = array();
 		$conditions_data = $this->processSpecificPart( $selected_model, "where" );
-		$state  = $selected_model->emptyState()->populateState()->getState();
 
 		if( count( $conditions_data ) > 0 ){
 			foreach( $conditions_data as $row ){
 				$clause = $row[0]->getWhereClause( $row[1] );
 				
 				if( $row[0]->getNatureOfOperation() ){ // if this operation works with model filter
-					
+					// we will deal with them later
+					$filters []= $clause;
 				} else { // nope, it has its own condition
-					
+					if( !isset( $conditions[$clause[0]] ) ){
+						$conditions[$clause[0]] = array();
+					}
+					$conditions[$clause[0]] = $clause[1];
 				}
-				
-				if( !isset( $updates[$clause[0]] ) ){
-					$updates[$clause[0]] = array();
-				}
-				$updates[$clause[0]] = $clause[1] + $updates[$clause[0]];
 			}
 		}
 		
 		// now, we should union specified conditions with the one used via filters
-	
-		return $updates;
+		if( count( $filters) > 0 ){
+			// yes, we need to merge with filters
+			$state  = $selected_model->emptyState()->populateState()->getState();
+			foreach($filters as $filter ){
+				$state->set('filter.'.$filter[0], $filter[1]);
+			}
+			$conditions = $state->conditions() + $conditions;
+		}
+		return $conditions;
 	}
 
 	/**

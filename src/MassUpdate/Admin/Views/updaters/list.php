@@ -127,8 +127,8 @@ jQuery(function(){
 	}); 
 
 	Dsc.MassUpdate.Elements.perform.on("click", function(){
-		var $form = $("form#updaters");
-		$form.submit();
+		$("form#updaters").submit();
+		// TODO: add some preliminary validation?
 	});
 
 	Dsc.MassUpdate.HandleCheckboxSelectGroup = function(event){

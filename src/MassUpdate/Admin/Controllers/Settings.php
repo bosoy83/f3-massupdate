@@ -13,4 +13,19 @@ class Settings extends \Admin\Controllers\BaseAuth
         $model = new \MassUpdate\Admin\Models\Settings;
         return $model;
     }
+    
+    /**
+     * Changes updater mode via AJAX
+     */
+    public function changeUpdaterMode(){
+    	$f3 = \Base::instance();
+    	$mode = $f3->get("PARAMS.mode");
+    	$model_settings = new \MassUpdate\Admin\Models\Settings;
+    	$settings = $model_settings->populateState()->getItem();
+    	$settings['general.updater_mode'] = (int)$mode;
+    	$settings->save();    	
+    	echo $this->outputJson( $this->getJsonResponse( array(
+    			'result' => "Updater mode has been changed"
+    	) ) );
+    }
 }

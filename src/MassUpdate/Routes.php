@@ -51,6 +51,12 @@ class Routes extends \Dsc\Routes\Group{
 				'controller' => 'Updaters',
 				'action' => 'doUpdate'
 		));
+
+		$this->add( '/settings/mode/@mode', 'GET', array(
+				'controller' => 'Settings',
+				'action' => 'changeUpdaterMode',
+				'ajax' => true
+		));
 		
 		$this->add( '/updaters/@updater/@model', 'GET', array(
 							'controller' => 'Updaters',

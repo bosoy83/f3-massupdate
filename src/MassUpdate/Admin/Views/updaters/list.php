@@ -142,6 +142,22 @@ jQuery(function(){
 	}
 
 	Dsc.MassUpdate.Elements.data_wrapper.on("change", ":checkbox", Dsc.MassUpdate.HandleCheckboxSelectGroup);
+
+	jQuery("#system-message-container").on('click', 'a.link_updater_mode_settings', function(event){
+		event.preventDefault();
+		$this = jQuery(event.currentTarget);
+		var mode_num = $this.data('updater-mode');
+		var link_url = './admin/massupdate/settings/mode/'+mode_num;
+	    var request = jQuery.ajax({
+	        type: 'get', 
+	        url: link_url
+	    }).done(function(data){
+	        var lr = jQuery.parseJSON( JSON.stringify(data), false);
+	        if (lr.result) {
+	        	alert(lr.result);
+	        }
+	    });
+	});
 });
 </script>
 

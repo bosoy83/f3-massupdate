@@ -11,7 +11,7 @@
 			$act_model.= 'model_slug: "'.$model['slug'].'",';
 			$act_model.= 'updater_slug: "'.$model['updater'].'"';
 			$models_js []= '{'.$act_model.'}';
-			if( in_array( $model['updater'], $updaters_list ) === false ){
+			if( in_array( $model['updater'], $updaters_list ) == false ){
 				$act_updater = 'title: "'.$model['title_updater'].'",';
 				$act_updater.= 'slug: "'.$model['updater'].'"';
 				$updaters_js []= '{'.$act_updater.'}';;

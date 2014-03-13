@@ -4,6 +4,7 @@ namespace MassUpdate\Service;
 class MassUpdate extends \Prefab 
 {
 	private $list_groups = array();
+	private $initialized = false;
 	
 	/**
 	 * Registers models which are able to integrate with f3-massupdate
@@ -18,11 +19,16 @@ class MassUpdate extends \Prefab
 	 * Lets all registered groups initialize
 	 */
 	public function initializeGroups(){
+		if( $this->initialized ){
+			return;
+		}
+
 		if( count( $this->list_groups ) > 0 ){
 			foreach( $this->list_groups as $group ){
 				$group->initialize();
 			}
 		}
+		$this->initialized = true;
 	}
 	
 	/**

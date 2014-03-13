@@ -224,7 +224,13 @@ class Updaters extends \Admin\Controllers\BaseAuth
                 			$selected_model->cast(),
 					   		array('upsert'=>false, 'multiple'=>false)
 					);
-			$num++;
+			$stats = \Dsc\System::instance()->get("mongo")->lastError();
+			if( empty( $stats['err'] ) && isset( $stats['ok'] ) && $stats['ok'] == 1 ){
+				$num++;
+			} else {
+				$res['error'] = true;
+				$res['error_msg'] .= "\n".\Dsc\Debug::dump( $stats );
+			}
 		}
 		$res = array(
 			'records' => $num,

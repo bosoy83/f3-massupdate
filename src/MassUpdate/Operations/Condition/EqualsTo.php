@@ -9,8 +9,11 @@ class EqualsTo extends \MassUpdate\Operations\Condition{
 
 	/**
 	 * This method returns where clause which will be later on passed to collection
+	 * 
+	 * @param 	$data		Data from request
+	 * @param	$params		Arrays with possible additional params (for different modes of updater)
 	 */
-	public function getWhereClause($data){
+	public function getWhereClause($data, $params = array()){
 		$data = $this->attribute->getInputFilter()->clean($data, "alnum");
 		return array($this->attribute->getAttributeCollection(), $data );
 	}

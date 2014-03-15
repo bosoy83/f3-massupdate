@@ -30,8 +30,11 @@ abstract class Condition implements \MassUpdate\Operations\Operation{
 	
 	/**
 	 * This method returns where clause which will be later on passed to collection
+	 * 
+	 * @param 	$data		Data from request
+	 * @param	$params		Arrays with possible additional params (for different modes of updater
 	 */
-	public abstract function getWhereClause($data);
+	public abstract function getWhereClause($data, $params = array());
 		
 	/**
 	 * This method returns string representation how the operation should be rendered in form

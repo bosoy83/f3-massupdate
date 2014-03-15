@@ -21,7 +21,7 @@ class IncreaseBy extends \MassUpdate\Operations\Update{
 		switch( $this->attribute->getUpdaterMode() ){
 			case 0: // buk update
 				{
-					return array('$inc', $this->attribute->getAttributeCollection().' = '.$data );
+					return array('$inc', array( $this->attribute->getAttributeCollection() => $data ) );
 				}
 			case 1: // document-by-document
 				{

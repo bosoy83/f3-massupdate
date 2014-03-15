@@ -163,29 +163,42 @@ class Updaters extends \Admin\Controllers\BaseAuth
 	 */
 	private function handleBulkUpdate($selected_model, $where_part, $update_data, $collection ){
 		$update_part = array();
+		$params = array( "dataset" => \Base::instance()->get("REQUEST"));
 		if( count( $update_data ) > 0 ){
 			foreach( $update_data as $row ){
-				$clause = $row[0]->getUpdateClause( $row[1] );
+				$params['idx'] = $row[2];
+				$clause = $row[0]->getUpdateClause( $row[1], $params );
+				// skip clauses which couldnt create an update operation
+				if( $clause == null ){
+					continue;
+				}
+				
 				if( !isset( $updates[$clause[0]] ) ){
 					$update_part[$clause[0]] = array();
 				}
 				$update_part[$clause[0]] = $clause[1] + $update_part[$clause[0]];
 			}
 		}
-		$collection->update( $where_part, $update_part, array("multiple" => true  ) );
-		
-		// process results
-		$stats = \Dsc\System::instance()->get("mongo")->lastError();
 		$res = array(
-			'records' => 0,
-			'error' => false,
-			'error_msg' => ""
+				'records' => 0,
+				'error' => false,
+				'error_msg' => ""
 		);
-		if( empty( $stats['err'] ) && isset( $stats['ok'] ) && $stats['ok'] == 1 ){
-			$res['records'] = $stats['n'];
-		} else {
+		try{
+			$collection->update( $where_part, $update_part, array("multiple" => true  ) );
+			
+			// process results
+			$stats = \Dsc\System::instance()->get("mongo")->lastError();
+			if( empty( $stats['err'] ) && isset( $stats['ok'] ) && $stats['ok'] == 1 ){
+				$res['records'] = $stats['n'];
+			} else {
+				$res['error'] = true;
+				$res['error_msg'] = \Dsc\Debug::dump( $stats );
+			}
+
+		} catch( \Exception $e){
 			$res['error'] = true;
-			$res['error_msg'] = \Dsc\Debug::dump( $stats );
+			$res['error_msg'] = $e->getMessage();	
 		}
 		
 		return $res;
@@ -203,6 +216,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 	 */
 	private function handleDocumentByDocument( $selected_model, $where_part, $update_data, $collection ){
 		
+		$params = array( "dataset" => \Base::instance()->get("REQUEST"));
 		$res = array(
 				'records' => 0,
 				'error' => true,
@@ -216,7 +230,16 @@ class Updaters extends \Admin\Controllers\BaseAuth
 			$selected_model->bind( $doc );
 			
 			foreach( $update_data as $op ){
-				$selected_model = $op[0]->getUpdateClause( $op[1], array( 'document' => $selected_model ));
+				$params['idx'] = $row[2];
+				$params['document'] = $selected_model;
+
+				$res_op = $op[0]->getUpdateClause( $op[1], $params );
+				// skip clauses which couldnt create a where condition
+				if( $res_op == null ){
+					continue;
+				} else {
+					$selected_model = $res_op;
+				}
 			}
 
 			$collection->update(
@@ -274,7 +297,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 					// something is not right with this attribute -> skip it
 					continue;
 				}
-				$result []= array( $operations[$opt], $data );
+				$result []= array( $operations[$opt], $data, $opt );
 			}
 		}
 	
@@ -292,10 +315,17 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		$conditions = array();
 		$filters = array();
 		$conditions_data = $this->processSpecificPart( $selected_model, "where" );
+		$params = array( "dataset" => \Base::instance()->get("REQUEST"));
 
 		if( count( $conditions_data ) > 0 ){
 			foreach( $conditions_data as $row ){
-				$clause = $row[0]->getWhereClause( $row[1] );
+				$params['idx'] = $row[2];
+				$clause = $row[0]->getWhereClause( $row[1], $params );
+				
+				// skip clauses which couldnt create a where condition
+				if( $clause == null ){
+					continue;
+				}
 				
 				if( $row[0]->getNatureOfOperation() ){ // if this operation works with model filter
 					// we will deal with them later

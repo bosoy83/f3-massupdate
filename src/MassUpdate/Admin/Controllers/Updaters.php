@@ -323,10 +323,9 @@ class Updaters extends \Admin\Controllers\BaseAuth
 				$clause = $row[0]->getWhereClause( $row[1], $params );
 				
 				// skip clauses which couldnt create a where condition
-				if( $clause == null ){
+				if( $clause == null || is_array( $clause ) == false ){
 					continue;
 				}
-				
 				if( $row[0]->getNatureOfOperation() ){ // if this operation works with model filter
 					// we will deal with them later
 					$filters []= $clause;
@@ -334,7 +333,11 @@ class Updaters extends \Admin\Controllers\BaseAuth
 					if( !isset( $conditions[$clause[0]] ) ){
 						$conditions[$clause[0]] = array();
 					}
-					$conditions[$clause[0]] = $clause[1];
+					if( is_array( $clause[1] ) ) {
+						$conditions[$clause[0]] = $clause[1] + $conditions[$clause[0]];
+					} else {
+						$conditions[$clause[0]] = $clause[1];
+					}
 				}
 			}
 		}

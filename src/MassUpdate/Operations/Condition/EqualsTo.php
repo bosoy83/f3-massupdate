@@ -15,7 +15,11 @@ class EqualsTo extends \MassUpdate\Operations\Condition{
 	 */
 	public function getWhereClause($data, $params = array()){
 		$data = $this->attribute->getInputFilter()->clean($data, "alnum");
-		return array($this->attribute->getAttributeCollection(), $data );
+
+		$res_clause = new \MassUpdate\Service\Models\Clause();
+		$res_clause->{'key'} = $this->attribute->getAttributeCollection();
+		$res_clause->{'val'} = $data;
+		return $res_clause;
 	}
 	
 	/**
@@ -24,7 +28,7 @@ class EqualsTo extends \MassUpdate\Operations\Condition{
 	public function getFormHtml(){
 		$name = $this->attribute->getAttributeCollection();
 		
-		return "<input name=\"".$name."_".$this->getTypeString()."_".$this->idx."\" class=\"form-control\" value=\"\" id=\"".$name."_".$this->getTypeString()."_".$this->idx."\" placeholder=\"".$this->getLabel()."\" type=\"text\" />";
+		return "<input name=\"".$this->getNameWithIdx()."\" class=\"form-control\" value=\"\" id=\"".$name."_".$this->getNameWithIdx()."\" placeholder=\"".$this->getLabel()."\" type=\"text\" />";
 	}
 	
 	/**

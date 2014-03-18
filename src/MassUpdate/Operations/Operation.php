@@ -49,5 +49,12 @@ interface Operation{
 	 * @return String representation of type of the operation (where or update)
 	 */
 	public function getTypeString();
+
+	/**
+	 * This method returns representation of name of this option including its index
+	 *  
+	 * @return String representation of name of this option including its index
+	 */
+	public function getNameWithIdx();
 }
 ?>

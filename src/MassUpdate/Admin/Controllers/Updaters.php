@@ -316,27 +316,34 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		$filters = array();
 		$conditions_data = $this->processSpecificPart( $selected_model, "where" );
 		$params = array( "dataset" => \Base::instance()->get("REQUEST"));
-
 		if( count( $conditions_data ) > 0 ){
 			foreach( $conditions_data as $row ){
 				$params['idx'] = $row[2];
-				$clause = $row[0]->getWhereClause( $row[1], $params );
-				
+				$clauses = $row[0]->getWhereClause( $row[1], $params );
 				// skip clauses which couldnt create a where condition
-				if( $clause == null || is_array( $clause ) == false ){
+				if( empty( $clauses ) ){
 					continue;
 				}
+				
+				if( is_array( $clauses ) == false ){
+					$clauses = array( $clauses );
+				}
+				
 				if( $row[0]->getNatureOfOperation() ){ // if this operation works with model filter
 					// we will deal with them later
-					$filters []= $clause;
-				} else { // nope, it has its own condition
-					if( !isset( $conditions[$clause[0]] ) ){
-						$conditions[$clause[0]] = array();
+					foreach( $clauses as $clause ){
+						$filters []= $clause;
 					}
-					if( is_array( $clause[1] ) ) {
-						$conditions[$clause[0]] = $clause[1] + $conditions[$clause[0]];
-					} else {
-						$conditions[$clause[0]] = $clause[1];
+				} else { // nope, it has its own condition
+					foreach( $clauses as $clause ){
+						if( isset( $conditions[$clause->{"key"}] ) ){
+							if( is_array( $conditions[$clause->{"key"}] ) == false ){
+								$conditions[$clause->{"key"}] = array( $conditions[$clause->{"key"}] );
+							}
+							$conditions[$clause->{"key"}] = $clause->{"val"} + $conditions[$clause->{"key"}];
+						} else {
+							$conditions[$clause->{"key"}] = $clause->{"val"};
+						}
 					}
 				}
 			}
@@ -347,10 +354,11 @@ class Updaters extends \Admin\Controllers\BaseAuth
 			// yes, we need to merge with filters
 			$state  = $selected_model->emptyState()->populateState()->getState();
 			foreach($filters as $filter ){
-				$state->set('filter.'.$filter[0], $filter[1]);
+				$state->set('filter.'.$filter->{"filter"}, $filter->{"val"});
 			}
 			$conditions = $selected_model->conditions() + $conditions;
 		}
+		
 		return $conditions;
 	}
 

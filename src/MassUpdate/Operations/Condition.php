@@ -114,5 +114,15 @@ abstract class Condition implements \MassUpdate\Operations\Operation{
 	public function getTypeString(){
 		return $this->type;
 	}
+	
+
+	/**
+	 * This method returns representation of name of this option including its index
+	 *
+	 * @return String representation of name of this option including its index
+	 */
+	public function getNameWithIdx(){
+		return $this->attribute->getAttributeCollection().'_'.$this->getTypeString().'_'.$this->idx;
+	}
 }
 ?>

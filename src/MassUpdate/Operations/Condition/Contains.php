@@ -14,17 +14,18 @@ class Contains extends \MassUpdate\Operations\Condition{
 	 * @param	$params		Arrays with possible additional params (for different modes of updater
 	 */
 	public function getWhereClause($data, $params = array()){
-		$data = $this->attribute->getInputFilter()->clean($data, "alnum");
-		return array( $this->filter, $data );
+		$data = $this->attribute->getInputFilter()->clean($data, "string");
+		$res_clause = new \MassUpdate\Service\Models\Clause();
+		$res_clause->{'filter'} = $this->filter;
+		$res_clause->{'val'} = $data;
+		return $res_clause;
 	}
 	
 	/**
 	 * This method returns string representation how the operation should be rendered in form
 	 */
 	public function getFormHtml(){
-		$name = $this->attribute->getAttributeCollection();
-		
-		return "<input name=\"".$name."_".$this->getTypeString()."_".$this->idx."\" class=\"form-control\" value=\"\" id=\"".$name."_".$this->getTypeString()."_".$this->idx."\" placeholder=\"".$this->getLabel()."\" type=\"text\" />";
+		return "<input name=\"".$this->getNameWithIdx()."\" class=\"form-control\" value=\"\" id=\"".$this->getNameWithIdx()."\" placeholder=\"".$this->getLabel()."\" type=\"text\" />";
 	}
 	
 	/**

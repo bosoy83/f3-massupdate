@@ -15,6 +15,7 @@ class CompareTo extends \MassUpdate\Operations\Condition{
 	 */
 	public function getWhereClause($data, $params = array()){
 		$data = $this->attribute->getInputFilter()->clean($data, "alnum");
+		$res_clause = new \MassUpdate\Service\Models\Clause();
 		// check required parameters
 		if( !isset( $params['idx'] ) || empty( $params['dataset'] ) ){
 			return null;
@@ -27,25 +28,27 @@ class CompareTo extends \MassUpdate\Operations\Condition{
 			return null;
 		}
 		$sign = $dataset[$name];
-		$res = null;		
 		switch( $sign ){
 			case '$gt':
 			case '$lt':
-				$res = array( $sign => array( $this->attribute->getAttributeCollection() => $data ) );
-				break;
+				$res_clause->{'key'} = $sign;
+				$res_clause->{'val'} = array( $this->attribute->getAttributeCollection() => $data );
+
+				return $res;
 			case '$eq':
-				$res = array( $this->attribute->getAttributeCollection(), $data );
-				break;
+				$res_clause->{'key'} = $this->attribute->getAttributeCollection();
+				$res_clause->{'val'} = $data;
+
+				return $res_clause;
 		}
-		return $res;
+		return null;
 	}
 	
 	/**
 	 * This method returns string representation how the operation should be rendered in form
 	 */
 	public function getFormHtml(){
-		$name = $this->attribute->getAttributeCollection();
-		$name_with_idx = $name.'_'.$this->getTypeString().'_'.$this->idx;
+		$name_with_idx = $this->getNameWithIdx();
 		
 		$html = '
 				<script type="text/javascript">
@@ -86,7 +89,7 @@ class CompareTo extends \MassUpdate\Operations\Condition{
 				  <input type="hidden" name="'.$name_with_idx.'_sign" id="'.$name_with_idx.'_sign" value="$eq" />
 							';
 		
-		return $html;//"<input name=\"".$name."_".$this->getTypeString()."_".$this->idx."\" class=\"form-control\" value=\"\" id=\"".$name."_".$this->getTypeString()."_".$this->idx."\" placeholder=\"".$this->getLabel()."\" type=\"text\" />";
+		return $html;
 	}
 	
 	/**

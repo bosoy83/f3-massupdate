@@ -36,9 +36,7 @@ class IncreaseBy extends \MassUpdate\Operations\Update{
 	 * This method returns string representation how the operation should be rendered in form
 	 */
 	public function getFormHtml(){
-		$name = $this->attribute->getAttributeCollection();
-		
-		return "<input name=\"".$name."_".$this->getTypeString()."_".$this->idx."\" class=\"form-control\" value=\"\" id=\"".$name."_".$this->getTypeString()."_".$this->idx."\" placeholder=\"".$this->getLabel()."\" type=\"text\" />";
+		return "<input name=\"".$this->getNameWithIdx()."\" class=\"form-control\" value=\"\" id=\"".$this->getNameWithIdx()."\" placeholder=\"".$this->getLabel()."\" type=\"text\" />";
 	}
 	
 	/**

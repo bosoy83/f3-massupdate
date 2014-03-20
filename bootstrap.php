@@ -1,5 +1,5 @@
 <?php 
-class MassUpdateBootstrap extends \Dsc\BaseBootstrap{
+class MassUpdateBootstrap extends \Dsc\Bootstrap{
 	protected $dir = __DIR__;
 	protected $namespace = 'MassUpdate';
 	

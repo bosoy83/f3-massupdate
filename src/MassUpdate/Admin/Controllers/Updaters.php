@@ -230,7 +230,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 			$selected_model->bind( $doc );
 			
 			foreach( $update_data as $op ){
-				$params['idx'] = $row[2];
+				$params['idx'] = $op[2];
 				$params['document'] = $selected_model;
 
 				$res_op = $op[0]->getUpdateClause( $op[1], $params );

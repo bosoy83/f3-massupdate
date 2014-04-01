@@ -89,7 +89,7 @@ Dsc.MassUpdate.DisableUI = function(){
 
 Dsc.MassUpdate.CacheElements = function(){
 	Dsc.MassUpdate.Elements = {};
-	Dsc.MassUpdate.Elements.form = jQuery("form#updater");
+	Dsc.MassUpdate.Elements.form = jQuery("form#updaters");
 	Dsc.MassUpdate.Elements.data_wrapper = jQuery("#updater-data");
 	Dsc.MassUpdate.Elements.select_updater = jQuery("select#updater-group");
 	Dsc.MassUpdate.Elements.select_model = jQuery("select#updater-model");
@@ -127,8 +127,27 @@ jQuery(function(){
 	}); 
 
 	Dsc.MassUpdate.Elements.perform.on("click", function(){
-		$("form#updaters").submit();
-		// TODO: add some preliminary validation?
+		// lets first check, if any update operation is selected
+		$upd_checks = jQuery( "table[data-type=\"update\"] td[data-type-td=\"attr-check\"] :checked", Dsc.MassUpdate.Elements.form );
+
+		if( $upd_checks.size() == 0 ){
+			alert( "Please, select at least one attribute you want to update." );
+		} else {
+			// now, make sure that user is OK with updating without any where conditions (in case this happens)
+			var do_submit = false;
+
+			$where_checks = jQuery( "table[data-type=\"where\"] td[data-type-td=\"attr-check\"] :checked", Dsc.MassUpdate.Elements.form );
+			if( $where_checks.size() == 0 ){
+				if( confirm( "Do you really want to perform update on all records?" ) ) { // yop, wer got the green light from him
+					do_submit = true;
+				}
+			} else{ // there are some checks so just update
+				do_submit = true;
+			}
+			if( do_submit ) {
+				$("form#updaters").submit();
+			}
+		}
 	});
 
 	Dsc.MassUpdate.HandleCheckboxSelectGroup = function(event){

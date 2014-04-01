@@ -1,4 +1,4 @@
-<table class="table table-striped">
+<table class="table table-striped" data-type="<?php echo $type; ?>">
 <?php if( count( $attributes ) ) {
 	 foreach( $attributes as $attr ){ 
 		$ops = $attr->getOperations($type);
@@ -16,7 +16,7 @@
 				$op->setIndex( $idx );
 		?>
 			<tr>
-				<td>
+				<td data-type-td="attr-check">
 					<input type="checkbox" value="<?php echo $idx; ?>" name="<?php echo $name?>[]" data-group-attr="<?php echo $name?>"/>
 				</td>
 				<td>

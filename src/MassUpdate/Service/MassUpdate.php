@@ -24,7 +24,7 @@ class MassUpdate extends \Prefab
 		}
 		
 		// get current mode from Settings model
-		$settings = new \MassUpdate\Admin\Models\Settings;
+		$settings = \MassUpdate\Admin\Models\Settings::fetch();
 		$current_settings = $settings->populateState()->getItem();
 		if( count( $this->list_groups ) > 0 ){
 			foreach( $this->list_groups as $group ){

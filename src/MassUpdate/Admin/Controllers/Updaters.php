@@ -7,8 +7,8 @@ class Updaters extends \Admin\Controllers\BaseAuth
 	public function index()
 	{
 		$f3 = \Base::instance();
-		$selected_updater = $f3->get("PARAMS.id");
-		$selected_model = $f3->get("PARAMS.model");
+		$selected_updater = $f3->get("PARAMS.id", "");
+		$selected_model = $f3->get("PARAMS.model", "");
 		
 		echo $this->getListHtml($selected_updater, $selected_model );
 	}
@@ -54,6 +54,9 @@ class Updaters extends \Admin\Controllers\BaseAuth
 	}
 
 	private function getUpdaterDataHtml($updater, $model){
+		if( empty( $updater ) || empty( $model ) ){
+			return "";
+		}
 		$service = \Dsc\System::instance()->get('massupdate');
 		$service->initializeGroups();
 		$selected_model = $service->getModel($model, $updater);
@@ -185,7 +188,8 @@ class Updaters extends \Admin\Controllers\BaseAuth
 				'error_msg' => ""
 		);
 		try{
-			$collection->update( $where_part, $update_part, array("multiple" => true  ) );
+//			$collection->update( $where_part, $update_part, array("multiple" => true  ) );
+			\Dsc\System::instance()->addMessage( "Selected: ".$collection.find( $where_part )->count() );				
 			
 			// process results
 			$stats = \Dsc\System::instance()->get("mongo")->lastError();
@@ -241,12 +245,13 @@ class Updaters extends \Admin\Controllers\BaseAuth
 					$selected_model = $res_op;
 				}
 			}
-
+/*
 			$collection->update(
                 			array('_id'=> new \MongoId((string) $selected_model->get('id') ) ),
                 			$selected_model->cast(),
 					   		array('upsert'=>false, 'multiple'=>false)
 					);
+*/
 			$stats = \Dsc\System::instance()->get("mongo")->lastError();
 			if( empty( $stats['err'] ) && isset( $stats['ok'] ) && $stats['ok'] == 1 ){
 				$num++;

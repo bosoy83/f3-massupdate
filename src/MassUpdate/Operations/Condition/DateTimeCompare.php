@@ -8,7 +8,6 @@ namespace MassUpdate\Operations\Condition;
 class DateTimeCompare extends \MassUpdate\Operations\Condition{
 
 	private $mode; // 0 => only date, 1 => date + time
-	private $dateformat; // "yyyy-mm-dd" by default
 	
 	private function isShowTime(){
 		return $this->mode > 0;
@@ -200,7 +199,7 @@ class DateTimeCompare extends \MassUpdate\Operations\Condition{
 				  			<input type="hidden" name="'.$name_with_idx.'_sign" id="'.$name_with_idx.'_sign" value="equ" />
 							
 							<span class="input-group-addon" data-addon-type="start">Date</span>
-				  			<input name="'.$name_with_idx.'" placeholder="Select date" value="" class="ui-datepicker form-control" contenteditable="false" type="text" data-date-format="'.$this->dateformat.'" data-date-today-highlight="true" data-date-today-btn="true">
+				  			<input name="'.$name_with_idx.'" placeholder="Select date" value="" class="ui-datepicker form-control" contenteditable="false" type="text" data-date-format="yyyy-mm-dd" data-date-today-highlight="true" data-date-today-btn="true">
 							<span class="input-group-addon"><i class="fa fa-calendar-o"></i></span>
 						</div>
 				';
@@ -217,7 +216,7 @@ class DateTimeCompare extends \MassUpdate\Operations\Condition{
 					<div class="pull-left" data-datetime-range="'.$name_with_idx.'">
 						<div class="input-group col-md-offset-2 col-md-6 pull-left">
 							<span class="input-group-addon">To</span>
-							<input name="'.$name_with_idx.'_end" value="" placeholder="Select end date" class="ui-datepicker form-control" type="text" data-date-format="'.$this->dateformat.'" data-date-today-highlight="true" data-date-today-btn="true">
+							<input name="'.$name_with_idx.'_end" value="" placeholder="Select end date" class="ui-datepicker form-control" type="text" data-date-format="yyyy-mm-dd" data-date-today-highlight="true" data-date-today-btn="true">
 							<span class="input-group-addon"><i class="fa fa-calendar-o"></i></span>
 						</div>
 				 ';
@@ -260,12 +259,6 @@ class DateTimeCompare extends \MassUpdate\Operations\Condition{
 			$this->mode = 0;
 		} else {
 			$this->mode = $params['mode'];
-		}
-		
-		if( empty( $params['dateformat'])){
-			$this->dateformat = 'yyyy-mm-dd';
-		} else {
-			$this->dateformat = $params['dateformat'];
 		}
 	}
 	

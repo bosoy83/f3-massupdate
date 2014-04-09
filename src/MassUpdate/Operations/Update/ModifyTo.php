@@ -31,11 +31,11 @@ class ModifyTo extends \MassUpdate\Operations\Update{
 			case 1: // document-by-document
 				{
 					$doc = $params['document'];
-					$id = $params['idx'];
+					$name_with_idx = $this->getNameWithIdx();
 					$dataset = $params['dataset'];
 					$attr_collection = $this->attribute->getAttributeCollection();
-					$name_type = $this->attribute->getAttributeCollection().'_'.$this->getTypeString().'_'.$id.'_type';
-					$name_op = $this->attribute->getAttributeCollection().'_'.$this->getTypeString().'_'.$id.'_operation';
+					$name_type = $name_with_idx.'_type';
+					$name_op = $name_with_idx.'_operation';
 					// cant find type => skip this
 					if( empty($dataset[$name_type]) || empty( $dataset[$name_op])){
 						return null;

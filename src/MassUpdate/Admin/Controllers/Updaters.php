@@ -169,7 +169,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		$params = array( "dataset" => \Base::instance()->get("REQUEST"));
 		if( count( $update_data ) > 0 ){
 			foreach( $update_data as $row ){
-				$params['idx'] = $row[2];
+				$row[0]->setIndex( $row[2]);
 				$clause = $row[0]->getUpdateClause( $row[1], $params );
 				// skip clauses which couldnt create an update operation
 				if( $clause == null ){
@@ -188,8 +188,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 				'error_msg' => ""
 		);
 		try{
-//			$collection->update( $where_part, $update_part, array("multiple" => true  ) );
-			\Dsc\System::instance()->addMessage( "Selected: ".$collection->find( $where_part )->count() );
+			$collection->update( $where_part, $update_part, array("multiple" => true  ) );
 			
 			// process results
 			$stats = \Dsc\System::instance()->get("mongo")->lastError();
@@ -228,14 +227,12 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		);
 		
 		$cursor = $collection->find( $where_part );
-//		print_r( $where_part );
-//		exit(0);
 		$num = 0;
 		foreach( $cursor as $doc ){
 			$selected_model->bind( $doc );
 			
 			foreach( $update_data as $op ){
-				$params['idx'] = $op[2];
+				$op[0]->setIndex( $op[2]);
 				$params['document'] = $selected_model;
 
 				$res_op = $op[0]->getUpdateClause( $op[1], $params );
@@ -246,13 +243,13 @@ class Updaters extends \Admin\Controllers\BaseAuth
 					$selected_model = $res_op;
 				}
 			}			
-/*
+
 			$collection->update(
                 			array('_id'=> new \MongoId((string) $selected_model->get('id') ) ),
                 			$selected_model->cast(),
 					   		array('upsert'=>false, 'multiple'=>false)
 					);
-*/
+
 			$stats = \Dsc\System::instance()->get("mongo")->lastError();
 			if( empty( $stats['err'] ) && isset( $stats['ok'] ) && $stats['ok'] == 1 ){
 				$res['records']++;

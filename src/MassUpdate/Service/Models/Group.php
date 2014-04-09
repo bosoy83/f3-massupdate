@@ -34,6 +34,7 @@ abstract class Group extends \Prefab
 	 */
 	protected function addModel( $model, $mode ){
 		$this->models []= $model;
+		$model->setConfig( array( "context" => "MassUpdate.".$model->getSlugMassUpdate('.')));
 		$attributes = $model->getMassUpdateOperationGroups();
 		
 		// set mode for all update operations

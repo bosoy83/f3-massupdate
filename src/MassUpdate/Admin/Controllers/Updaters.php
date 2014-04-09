@@ -228,8 +228,8 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		);
 		
 		$cursor = $collection->find( $where_part );
-		
-		
+//		print_r( $where_part );
+//		exit(0);
 		$num = 0;
 		foreach( $cursor as $doc ){
 			$selected_model->bind( $doc );
@@ -246,13 +246,13 @@ class Updaters extends \Admin\Controllers\BaseAuth
 					$selected_model = $res_op;
 				}
 			}			
-
+/*
 			$collection->update(
                 			array('_id'=> new \MongoId((string) $selected_model->get('id') ) ),
                 			$selected_model->cast(),
 					   		array('upsert'=>false, 'multiple'=>false)
 					);
-
+*/
 			$stats = \Dsc\System::instance()->get("mongo")->lastError();
 			if( empty( $stats['err'] ) && isset( $stats['ok'] ) && $stats['ok'] == 1 ){
 				$res['records']++;

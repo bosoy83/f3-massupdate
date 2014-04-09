@@ -7,8 +7,8 @@ trait Model
 	 * This method returns unique string identifying this model.
 	 * The unique identifier is generated from namespaced class name of the model
 	 */
-	public function getSlugMassUpdate(){
-		return str_replace( '\\', '-', get_class( $this ) );
+	public function getSlugMassUpdate($with = '-'){
+		return str_replace( '\\', $with, get_class( $this ) );
 	}
 	
 	/**

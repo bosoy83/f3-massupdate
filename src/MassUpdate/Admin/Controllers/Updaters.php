@@ -223,11 +223,12 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		$params = array( "dataset" => \Base::instance()->get("REQUEST"));
 		$res = array(
 				'records' => 0,
-				'error' => true,
-				'error_msg' => "Not implemented yet"
+				'error' => false,
+				'error_msg' => ""
 		);
 		
 		$cursor = $collection->find( $where_part );
+		
 		
 		$num = 0;
 		foreach( $cursor as $doc ){
@@ -245,28 +246,21 @@ class Updaters extends \Admin\Controllers\BaseAuth
 					$selected_model = $res_op;
 				}
 			}			
-			\Dsc\System::instance()->addMessage( "Selected ID: ".$selected_model->{"id"}.'('.$selected_model->{'title'}.')' );
 
-/*
 			$collection->update(
                 			array('_id'=> new \MongoId((string) $selected_model->get('id') ) ),
                 			$selected_model->cast(),
 					   		array('upsert'=>false, 'multiple'=>false)
 					);
-*/
+
 			$stats = \Dsc\System::instance()->get("mongo")->lastError();
 			if( empty( $stats['err'] ) && isset( $stats['ok'] ) && $stats['ok'] == 1 ){
-				$num++;
+				$res['records']++;
 			} else {
 				$res['error'] = true;
 				$res['error_msg'] .= "\n".\Dsc\Debug::dump( $stats );
 			}
 		}
-		$res = array(
-			'records' => $num,
-			'error' => false,
-			'error_msg' => ""
-		) + $res;
 		return $res;
 	}
 
@@ -366,7 +360,6 @@ class Updaters extends \Admin\Controllers\BaseAuth
 			}
 		}
 		$conditions = $selected_model->conditions() + $conditions;
-		var_dump( $conditions );
 		
 		return $conditions;
 	}

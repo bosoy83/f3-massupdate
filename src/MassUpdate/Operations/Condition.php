@@ -13,6 +13,11 @@ abstract class Condition implements \MassUpdate\Operations\Operation{
 	protected $type = 'where';
 	
 	/**
+	 * Custom label in case we want it
+	 */
+	protected $custom_label = '';
+	
+	/**
 	 * Name of attribute to which this operation is assigned
 	 */
 	protected $attribute;
@@ -53,12 +58,23 @@ abstract class Condition implements \MassUpdate\Operations\Operation{
 		
 		return $this;
 	}
-	
+
 	/**
 	 * This method returns label for getFormHtml() element which should be used as a label for this
 	 * operation in form
 	 */
-	public abstract function getLabel();
+	public function getLabel(){
+		if( strlen( $this->custom_label ) ){
+			return $this->custom_label;
+		} else {
+			return $this->getGenericLabel();
+		}
+	}
+	
+	/**
+	 * This method returns generic labal in case a custom label was not defined
+	 */
+	public abstract function getGenericLabel();
 	
 	/**
 	 * This method sets index of this operation in list of all of them
@@ -102,6 +118,10 @@ abstract class Condition implements \MassUpdate\Operations\Operation{
 			if($this->getNatureOfOperation() && isset( $params['filter'] ) ){
 				$this->setOperationFilter( $params['filter']);
 			}
+			
+			if( !empty( $params['custom_label'] ) ){
+				$this->custom_label = $params['custom_label'];
+			}
 		}
 	}
 	
@@ -133,6 +153,13 @@ abstract class Condition implements \MassUpdate\Operations\Operation{
 	 */
 	public function getNameWithIdx(){
 		return str_replace( '.', '_', $this->attribute->getAttributeCollection() ) .'_'.$this->getTypeString().'_'.$this->idx;
+	}
+	
+	/**
+	 * This method returns custom label, if it was defined
+	 */
+	protected function getCustomLabel(){
+		return $this->custom_label;
 	}
 }
 ?>

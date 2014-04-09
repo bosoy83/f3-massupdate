@@ -2,10 +2,10 @@
 namespace MassUpdate\Operations\Condition;
 
 /**
- * Checks, if a field is containts this string
+ * Checks, if a field (of boolean type) matches the expected value
  * 
  */
-class Contains extends \MassUpdate\Operations\Condition{
+class Boolean extends \MassUpdate\Operations\Condition{
 
 	/**
 	 * This method returns where clause which will be later on passed to collection
@@ -18,10 +18,13 @@ class Contains extends \MassUpdate\Operations\Condition{
 			return null;
 		}
 		
-		$data = $this->attribute->getInputFilter()->clean($data, "string");
+		$data = (string)((int)$data);
 		$res_clause = new \MassUpdate\Service\Models\Clause();
-		$res_clause->{'filter'} = $this->filter;
-		$res_clause->{'val'} = $data;
+		$res_clause->{'key'} = '$or';
+		$res_clause->{'val'} = array( 
+								array( $this->attribute->getAttributeCollection() => $data == '1' ),
+								array( $this->attribute->getAttributeCollection() => $data )
+								);
 		return $res_clause;
 	}
 	
@@ -29,7 +32,15 @@ class Contains extends \MassUpdate\Operations\Condition{
 	 * This method returns string representation how the operation should be rendered in form
 	 */
 	public function getFormHtml(){
-		return "<input name=\"".$this->getNameWithIdx()."\" class=\"form-control\" value=\"\" id=\"".$this->getNameWithIdx()."\" placeholder=\"".$this->getLabel()."\" type=\"text\" />";
+		$name = $this->attribute->getAttributeCollection();
+		$html = '
+				<select name="'.$this->getNameWithIdx().'" id="'.$this->getNameWithIdx().'">
+					<option value="1">True</option>
+					<option value="0">False</option>
+				</select>
+				';
+		
+		return $html;
 	}
 	
 	/**
@@ -37,7 +48,7 @@ class Contains extends \MassUpdate\Operations\Condition{
 	 * operation in form
 	 */
 	public function getGenericLabel(){
-		return "Contains";
+		return "Boolean value is";
 	}
 
 	/**
@@ -46,7 +57,7 @@ class Contains extends \MassUpdate\Operations\Condition{
 	 * @return True if it uses model's filter
 	 */
 	public function getNatureOfOperation(){
-		return true;
+		return false;
 	}
 }
 ?>

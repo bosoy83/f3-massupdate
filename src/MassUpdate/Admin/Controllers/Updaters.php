@@ -360,13 +360,13 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		$selected_model->emptyState()->populateState();
 		if( count( $filters) > 0 ){
 			// yes, we need to merge with filters
-			$state  = $selected_mode->getState();
+			$state  = $selected_model->getState();
 			foreach($filters as $filter ){
 				$state->set('filter.'.$filter->{"filter"}, $filter->{"val"});
 			}
 		}
 		$conditions = $selected_model->conditions() + $conditions;
-		print_r( $conditions );
+		var_dump( $conditions );
 		
 		return $conditions;
 	}

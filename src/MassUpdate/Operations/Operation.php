@@ -20,6 +20,11 @@ interface Operation{
 	 * @return Instance of this class in order to support chaining of operations
 	 */
 	public function setAttribute($attr);
+
+	/**
+	 * This method returns generic labal in case a custom label was not defined
+	 */
+	public function getGenericLabel();
 	
 	/**
 	 * This method returns label for getFormHtml() element which should be used as a label for this

@@ -22,7 +22,7 @@ class CompareTo extends \MassUpdate\Operations\Condition{
 		}
 		$id = $params['idx'];
 		$dataset = $params['dataset'];
-		$name = $this->attribute->getAttributeCollection().'_'.$this->getTypeString().'_'.$id.'_sign';
+		$name = $this->getNameWithIdx().'_sign';
 		// cant find sign => skip this
 		if( empty($dataset[$name]) ){
 			return null;
@@ -96,8 +96,8 @@ class CompareTo extends \MassUpdate\Operations\Condition{
 	 * This method returns label for getFormHtml() element which should be used as a label for this
 	 * operation in form
 	 */
-	public function getLabel(){
-		return "The content is";
+	public function getGenericLabel(){
+			return "The content is";
 	}
 
 	/**

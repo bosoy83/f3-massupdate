@@ -13,6 +13,11 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 	protected $type = 'update';
 
 	/**
+	 * Custom label in case we want it
+	 */
+	protected $custom_label = '';
+	
+	/**
 	 * Mode of updater
 	 */
 	protected $updater_mode;
@@ -69,7 +74,18 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 	 * This method returns label for getFormHtml() element which should be used as a label for this
 	 * operation in form
 	 */
-	public abstract function getLabel();
+	public function getLabel(){
+		if( strlen( $this->custom_label ) ){
+			return $this->custom_label;
+		} else {
+			return $this->getGenericLabel();
+		}
+	}
+
+	/**
+	 * This method returns generic labal in case a custom label was not defined
+	 */
+	public abstract function getGenericLabel();
 	
 	/**
 	 * This method sets index of this operation in list of all of them
@@ -91,6 +107,11 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 	 * @param $param 	Array with additional parameters
 	 */
 	public function setParams( $params ){
+		if( !empty( $params ) && is_array( $params ) ){
+			if( !empty( $params['custom_label'] ) ){
+				$this->custom_label = $params['custom_label'];
+			}
+		}
 	}
 
 	/**

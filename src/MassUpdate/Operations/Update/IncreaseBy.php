@@ -43,7 +43,7 @@ class IncreaseBy extends \MassUpdate\Operations\Update{
 	 * This method returns label for getFormHtml() element which should be used as a label for this
 	 * operation in form
 	 */
-	public function getLabel(){
+	public function getGenericLabel(){
 		return "Increase by";
 	}
 }

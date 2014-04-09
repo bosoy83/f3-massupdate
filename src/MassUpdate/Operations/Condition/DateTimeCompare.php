@@ -137,11 +137,13 @@ class DateTimeCompare extends \MassUpdate\Operations\Condition{
 						Dsc.MassUpdate.handleDateTimeCompareRange = function($this, $parent, obj_id ){
 							jQuery( "input[name=\""+obj_id+"\"]", $parent ).prop( "placeholder", "Select start date" ); 
 							jQuery( "div[data-datetime-range=\""+obj_id+"\"").show();
+							jQuery( "span[data-addon-type=\"start\"]").html( "From" ); 
 						}
 
 						Dsc.MassUpdate.handleDateTimeCompareRangeHide = function($parent, obj_id ){
 							jQuery( "input[name=\""+obj_id+"\"]", $parent ).prop( "placeholder", "Select date" ); 
 							jQuery( "div[data-datetime-range=\""+obj_id+"\"").hide();
+							jQuery( "span[data-addon-type=\"start\"]").html( "Date" ); 
 						}
 					
 						Dsc.MassUpdate.handleDateTimeCompareDropDown = function(event){
@@ -197,8 +199,8 @@ class DateTimeCompare extends \MassUpdate\Operations\Condition{
 							</div>
 				  			<input type="hidden" name="'.$name_with_idx.'_sign" id="'.$name_with_idx.'_sign" value="equ" />
 							
-							<span class="input-group-addon">From</span>
-				  			<input name="'.$name_with_idx.'" placeholder="Selecte date" value="" class="ui-datepicker form-control" contenteditable="false" type="text" data-date-format="'.$this->dateformat.'" data-date-today-highlight="true" data-date-today-btn="true">
+							<span class="input-group-addon" data-addon-type="start">Date</span>
+				  			<input name="'.$name_with_idx.'" placeholder="Select date" value="" class="ui-datepicker form-control" contenteditable="false" type="text" data-date-format="'.$this->dateformat.'" data-date-today-highlight="true" data-date-today-btn="true">
 							<span class="input-group-addon"><i class="fa fa-calendar-o"></i></span>
 						</div>
 				';
@@ -239,7 +241,7 @@ class DateTimeCompare extends \MassUpdate\Operations\Condition{
 	 * operation in form
 	 */
 	public function getLabel(){
-		if( $this->mode > 0 ){
+		if( $this->mode == 0 ){
 			return "Select date";
 		} else {
 			return "Selete date and time";

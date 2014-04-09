@@ -112,7 +112,18 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 		return -1;
 	}
 	
-
+	/**
+	 * Checks, if all necesarry parameters for this operation are provided
+	 *
+	 * @param unknown $params
+	 */
+	public function checkParams( $params ){
+		if( empty( $params['dataset'] ) ){
+			return false;
+		}
+		return true;
+	}
+	
 	/**
 	 * This method returns representation of name of this option including its index
 	 *

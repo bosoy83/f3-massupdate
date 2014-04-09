@@ -244,7 +244,9 @@ class Updaters extends \Admin\Controllers\BaseAuth
 				} else {
 					$selected_model = $res_op;
 				}
-			}
+			}			
+			\Dsc\System::instance()->addMessage( "Selected ID: ".$selected_model->{"id"}.'('.$selected_model->{'title'}.')' );
+
 /*
 			$collection->update(
                 			array('_id'=> new \MongoId((string) $selected_model->get('id') ) ),

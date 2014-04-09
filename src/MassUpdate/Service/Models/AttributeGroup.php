@@ -17,6 +17,11 @@ class AttributeGroup extends \Prefab
 	protected $title;
 	
 	/**
+	 * Model to which the group is associated
+	 */
+	protected $model;
+	
+	/**
 	 * List of operations
 	 */
 	protected $operations = array();
@@ -125,7 +130,33 @@ class AttributeGroup extends \Prefab
 		$this->updater_mode = $mode;
 	}
 	
+	/**
+	 * This method gets updater mode for this operation
+	 * 
+	 * @return	Current updater mode
+	 */
 	public function getUpdaterMode(){
 		return $this->updater_mode;
+	}
+	
+	/**
+	 * This method sets  model associated to this attribute
+	 * 
+	 * @param $model	Current model
+	 * 
+	 * @return	Pointer to this instance in order to support chaining
+	 */
+	public function setModel($model){
+		$this->model = $model;
+		return $this;
+	}
+	
+	/**
+	 * This method gets model associated to this attribute
+	 * 
+	 * @return Instance of model associatedto this attribute
+	 */
+	public function getModel(){
+		return $this->model;
 	}
 }

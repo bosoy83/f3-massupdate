@@ -90,4 +90,5 @@ class MassUpdate extends \Prefab
 		}
 		return $res;
 	}
+
 }

@@ -247,6 +247,7 @@ class DateTimeCompare extends \MassUpdate\Operations\Condition{
 			return "Selete date and time";
 		}
 	}
+	
 	/**
 	 * This methods sets additional parameters for this operation
 	 * Note: For update operations, nothing by default

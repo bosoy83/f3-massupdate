@@ -26,8 +26,8 @@
 					    <label class="control-label col-md-3">Mode</label>
 			            <div class="input-group">
 							<select id="updater-mode" name="general[updater_mode]" class="form-control">
-								<option value="0" <?php if( $flash->old('general.updater_mode') == 0) echo 'selected'; ?>>Bulk update</option>
-								<option value="1" <?php if( $flash->old('general.updater_mode') == 1) echo 'selected'; ?>>Document-by-document update</option>
+								<option value="0" <?php if( $flash->old('general.updater_mode') == 0) echo 'selected'; ?>>Bulk update (0)</option>
+								<option value="1" <?php if( $flash->old('general.updater_mode') == 1) echo 'selected'; ?>>Document-by-document update (1)</option>
 							</select>
 		            	</div>
 					</div>

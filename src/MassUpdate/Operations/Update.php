@@ -119,7 +119,7 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 	 * @return String representation of name of this option including its index
 	 */
 	public function getNameWithIdx(){
-		return $this->attribute->getAttributeCollection().'_'.$this->getTypeString().'_'.$this->idx;
+		return str_replace( '.', '_', $this->attribute->getAttributeCollection() ) .'_'.$this->getTypeString().'_'.$this->idx;
 	}
 }
 ?>

@@ -14,6 +14,9 @@ class EqualsTo extends \MassUpdate\Operations\Condition{
 	 * @param	$params		Arrays with possible additional params (for different modes of updater)
 	 */
 	public function getWhereClause($data, $params = array()){
+		if( !$this->checkParams( $params ) ){
+			return null;
+		}
 		$data = $this->attribute->getInputFilter()->clean($data, "alnum");
 
 		$res_clause = new \MassUpdate\Service\Models\Clause();

@@ -105,6 +105,17 @@ abstract class Condition implements \MassUpdate\Operations\Operation{
 		}
 	}
 	
+	/**
+	 * Checks, if all necesarry parameters for this operation are provided
+	 * 
+	 * @param unknown $params
+	 */
+	public function checkParams( $params ){
+		if( empty( $params['dataset'] ) ){
+			return false;
+		}
+		return true;
+	}
 
 	/**
 	 * This method returns string representation of type of the operation
@@ -114,7 +125,6 @@ abstract class Condition implements \MassUpdate\Operations\Operation{
 	public function getTypeString(){
 		return $this->type;
 	}
-	
 
 	/**
 	 * This method returns representation of name of this option including its index
@@ -122,7 +132,7 @@ abstract class Condition implements \MassUpdate\Operations\Operation{
 	 * @return String representation of name of this option including its index
 	 */
 	public function getNameWithIdx(){
-		return $this->attribute->getAttributeCollection().'_'.$this->getTypeString().'_'.$this->idx;
+		return str_replace( '.', '_', $this->attribute->getAttributeCollection() ) .'_'.$this->getTypeString().'_'.$this->idx;
 	}
 }
 ?>

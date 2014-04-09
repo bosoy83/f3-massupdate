@@ -17,7 +17,7 @@ class CompareTo extends \MassUpdate\Operations\Condition{
 		$data = $this->attribute->getInputFilter()->clean($data, "alnum");
 		$res_clause = new \MassUpdate\Service\Models\Clause();
 		// check required parameters
-		if( !isset( $params['idx'] ) || empty( $params['dataset'] ) ){
+		if( !$this->checkParams( $params ) ){
 			return null;
 		}
 		$id = $params['idx'];

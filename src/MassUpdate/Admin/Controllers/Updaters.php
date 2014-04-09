@@ -323,7 +323,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		$params = array( "dataset" => \Base::instance()->get("REQUEST"));
 		if( count( $conditions_data ) > 0 ){
 			foreach( $conditions_data as $row ){
-				$params['idx'] = $row[2];
+				$row[0]->setIndex( $row[2] );
 				$clauses = $row[0]->getWhereClause( $row[1], $params );
 				// skip clauses which couldnt create a where condition
 				if( empty( $clauses ) ){
@@ -355,14 +355,16 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		}
 		
 		// now, we should union specified conditions with the one used via filters
+		$selected_model->emptyState()->populateState();
 		if( count( $filters) > 0 ){
 			// yes, we need to merge with filters
-			$state  = $selected_model->emptyState()->populateState()->getState();
+			$state  = $selected_mode->getState();
 			foreach($filters as $filter ){
 				$state->set('filter.'.$filter->{"filter"}, $filter->{"val"});
 			}
-			$conditions = $selected_model->conditions() + $conditions;
 		}
+		$conditions = $selected_model->conditions() + $conditions;
+		print_r( $conditions );
 		
 		return $conditions;
 	}

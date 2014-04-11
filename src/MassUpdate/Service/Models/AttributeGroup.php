@@ -147,7 +147,7 @@ class AttributeGroup extends \Prefab
 	 * @return	Pointer to this instance in order to support chaining
 	 */
 	public function setModel($model){
-		$this->model = $model;
+		$this->model = clone $model;
 		return $this;
 	}
 	

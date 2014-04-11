@@ -31,7 +31,7 @@ class ChangeUser extends \MassUpdate\Operations\Update{
 		}
 		$act_user = $act_user->getNext();
 		$res_updates = array(
-			$this->attribute->getAttributeCollection().'.id' => $data,
+			$this->attribute->getAttributeCollection().'.id' => new \MongoId( (string)$data ),
 			$this->attribute->getAttributeCollection().'.name' => $act_user['username']
 		);
 		

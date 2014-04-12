@@ -6,6 +6,8 @@ namespace MassUpdate\Service\Models;
  */
 abstract class Group extends \Prefab 
 {
+	protected $name;
+	
 	/**
 	 * Title of this group
 	 */
@@ -40,10 +42,31 @@ abstract class Group extends \Prefab
 		// set mode for all update operations
 		if( count( $attributes ) ){
 			foreach( $attributes as $attr ){
-				$attr->setUpdaterMode( $mode );
+				$attr->setUpdaterMode( $mode )
+					->setGroupName( $this->getName());
 			}
 		}
 		return $this;
+	}
+	
+	/**
+	 * This method sets name of this group
+	 * 
+	 * @param $name		Name of this group
+	 * @return \MassUpdate\Service\Models\Group Pointer to this instancce in order to support chaining
+	 */
+	public function setName($name){
+		$this->name = $name;
+		return $this;
+	}
+
+	/**
+	 * This method gets name of this group
+	 *
+	 * @return	Name of this group
+	 */
+	public function getName(){
+		return $this->name;
 	}
 	
 	/**

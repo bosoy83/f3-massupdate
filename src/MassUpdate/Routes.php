@@ -63,5 +63,11 @@ class Routes extends \Dsc\Routes\Group{
 							'action' => 'getUpdaterDataAjax',
 							'ajax' => true
 							));
+
+		$this->add( '/updaters/ajax', 'POST', array(
+							'controller' => 'Updaters',
+							'action' => 'doAjaxOperation',
+							'ajax' => true
+							));
 	}
 }

@@ -391,4 +391,13 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		}
 		return $model;
 	}
+	
+	/**
+	 * This method handles AJAX requests from operations and dispatches them further
+	 */
+	public function doAjax(){
+		// first of all, lets check, if we know where and what do we want to dispatch
+		
+		
+	}
 }

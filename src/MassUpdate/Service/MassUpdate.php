@@ -9,10 +9,20 @@ class MassUpdate extends \Prefab
 	/**
 	 * Registers models which are able to integrate with f3-massupdate
 	 * 
-	 * @param $group	Group with title and list of supported models
+	 * @param $group		Group with title and list of supported models
+	 * @param $group_name	Group name
 	 */
-	public function registerGroup($group){
-		$this->list_groups []=$group;
+	public function registerGroup($group ){
+		if( $group instanceof \MassUpdate\Service\Models\Group ){
+			$name = $group->getName();
+			if( empty( $this->list_groups[$name]) ){
+				$this->list_groups[$name] = $group;
+			} else {
+				throw new \Exception("Mass Update Group with this name already exist!");
+			}
+		} else {
+			throw new \Exception( "Group you want to register for Mass Update is not an instance of the correct class" );
+		}
 	}
 
 	/**
@@ -27,8 +37,8 @@ class MassUpdate extends \Prefab
 		$settings = \MassUpdate\Admin\Models\Settings::fetch();
 		$current_settings = $settings->populateState()->getItem();
 		if( count( $this->list_groups ) > 0 ){
-			foreach( $this->list_groups as $group ){
-				$group->initialize($current_settings['general.updater_mode']);
+			foreach( $this->list_groups as $name => $group ){
+				$group->initialize($name, $current_settings['general.updater_mode']);
 			}
 		}
 		$this->initialized = true;

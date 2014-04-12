@@ -17,6 +17,12 @@ class AttributeGroup extends \Prefab
 	protected $title;
 	
 	/**
+	 * Namea of group of models this group of attributes is assigned to
+	 * @var unknown
+	 */
+	protected $group_name;
+	
+	/**
 	 * Model to which the group is associated
 	 */
 	protected $model;
@@ -125,9 +131,12 @@ class AttributeGroup extends \Prefab
 	 * This method sets updater mode for this operation
 	 * 
 	 * @param $mode		Current updater mode
+	 * 
+	 * @return	Pointer to this instance in order to support chaining
 	 */
 	public function setUpdaterMode($mode){
 		$this->updater_mode = $mode;
+		return $this;
 	}
 	
 	/**
@@ -158,5 +167,26 @@ class AttributeGroup extends \Prefab
 	 */
 	public function getModel(){
 		return $this->model;
+	}
+	
+	/**
+	 * This method sets name of group of models this attribute group is assigned to
+	 * 
+	 * @param $group	Current group name
+	 * 
+	 * @return	Pointer to this instance in order to support chaining
+	 */
+	public function setGroupName($group){
+		$this->group_name = $group;
+		return $this;
+	}
+	
+	/**
+	 * This method gets name of group of models this attribute group is assigned to
+	 * 
+	 * @return Name of group of models this attribute group is assigned to
+	 */
+	public function getGroupName(){
+		return $this->group_name;
 	}
 }

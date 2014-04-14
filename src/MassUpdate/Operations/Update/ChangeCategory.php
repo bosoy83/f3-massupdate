@@ -142,7 +142,7 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 		
 		if( $add_js ){
 			$html = '<script type="text/javascript">
-					Dsc.MassUpdateChangeCategoryAddCategory = function( ev ){
+					Dsc.MassUpdate.changeCategoryAddCategory = function( ev ){
 						$this = jQuery( ev.currentTarget );
 						var url_link = "./admin/massupdate/updaters/ajax";
 			
@@ -160,13 +160,44 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 				        });
 			
 					}
+			
+					Dsc.MassUpdate.handleChangeCategoryDropDown = function(event){
+							event.preventDefault();
+	
+							var $this = jQuery( event.currentTarget );
+							var $parent = $this.closest("div[data-content-type=\"MassUpdate-ChangeCategory\"]");
+							var obj_id = $parent.data( "content-id" );
+							var $this_link = jQuery("a[data-mode]", $this );
+							var obj_mode = $this_link.data("mode");
+					
+							jQuery( "input#"+obj_id+"_mode[type=\"hidden\"]").val(obj_mode);
+							jQuery( "button[data-toggle]", $parent).html( $this_link.text() + " <span class=\"caret\"></span>"); 
+					}
 					
 					jQuery(function() {
-						jQuery( "div[data-operation="'.$name.'"] ).on( "click", Dsc.MassUpdateChangeCategoryAddCategory );
-					});
-				</script>
+//						jQuery( "div[data-operation=\"'.$name.'\"]" ).on( "click", Dsc.MassUpdateChangeCategoryAddCategory );
+
+						jQuery("div[data-content-type=\"MassUpdate-ChangeCategory\"]")
+								.on( "click","li", Dsc.MassUpdate.handleChangeCategoryDropDown );
+						});
+					</script>
 				';
 		}
+		$html .= '<div class="input-group">
+					<div class="input-group-btn" data-content-type="MassUpdate-ChangeCategory" data-content-id="'.$name.'">
+			  		<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+					Add to Category<span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="#" data-mode="add" >Add to Category</a></li>
+						<li><a href="#" data-mode="replace">Replace Category</a></li>
+						<li><a href="#" data-mode="remove">Delete from Category</a></li>
+					</ul>
+		  			<input type="hidden" name="'.$name.'_mode" id="'.$name.'_mode" value="add" />
+					</div>
+		  		  </div>
+				';
+		
 		
 		$html .= '<div class="max-height-200 list-group-item">
 					<div class="checkbox">
@@ -189,7 +220,6 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 					</div>
 					';
 		}
-		$html .= '<input type="hidden" name="'.$this->getNameWithIdx().'_mode" value="remove">';
 		$html .= '</div>';
 
 		$model_name = $this->attribute->getModel()->getSlugMassUpdate();

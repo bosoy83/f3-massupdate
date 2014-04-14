@@ -106,7 +106,7 @@ class ChangeDateTime extends \MassUpdate\Operations\Update{
 					
 							jQuery( "input#"+obj_id+"_tz[type=\"hidden\"]").val(obj_tz);
 							jQuery( "button[data-toggle]", $parent).html( $this_link.text() + " <span class=\"caret\"></span>"); 
-						}
+						}					
 					
 						jQuery(function(){
 						    jQuery("div[data-content-type=\"MassUpadte-ChangeDateTime\"]")

@@ -143,7 +143,19 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 		if( $add_js ){
 			$html = '<script type="text/javascript">
 					Dsc.MassUpdate.changeCategoryAddCategory = function( ev ){
-						$this = jQuery( ev.currentTarget );
+						$this = jQuery( this );
+						
+					
+						data = {
+								"model" : $this.data("model"),
+								"group" : $this.data("group"),
+								"op" : $this.data( "op" ),
+								"op_type" : $this.data( "op_type" ),
+								"attr" : $this.data( "attr" ),
+								"action" : $this.data( "action" ),
+								"parent" : jQuery( "#parents select option:selected", $this).val(),
+								"title" : jQuert( "input[name=\"title\"", $this ).val()
+								};
 						var url_link = "./admin/massupdate/updaters/ajax";
 			
 				        var request = jQuery.ajax({
@@ -160,7 +172,25 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 				        });
 			
 					}
-			
+                    Dsc.MassUpdate.refreshChangeCategories = function(r) {
+
+                            var form_data = new Array();
+                        	jQuery.merge( form_data, jQuery(\'#categories-checkboxes\').find(\':input\').serializeArray() );
+                        	jQuery.merge( form_data, [{ name: "category_ids[]", value: r.result._id[\'$id\'] }] );
+
+                            var request = jQuery.ajax({
+                                type: \'post\', 
+                                url: \'./admin/shop/categories/checkboxes\',
+                                data: form_data
+                            }).done(function(data){
+                                var lr = jQuery.parseJSON( JSON.stringify(data), false);
+                                if (lr.result) {
+                                    jQuery(\'#categories-checkboxes\').html(lr.result);
+                                    App.initICheck();
+                                }
+                          });
+                    }
+					
 					Dsc.MassUpdate.handleChangeCategoryDropDown = function(event){
 							event.preventDefault();
 	
@@ -175,13 +205,15 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 					}
 					
 					jQuery(function() {
-//						jQuery( "div[data-operation=\"'.$name.'\"]" ).on( "click", Dsc.MassUpdateChangeCategoryAddCategory );
+						jQuery( "div[data-operation-create=\"'.$name.'\"]" )
+							.on( "click", "button",  Dsc.MassUpdateChangeCategoryAddCategory );
 
 						jQuery("div[data-content-type=\"MassUpdate-ChangeCategory\"]")
 								.on( "click","li", Dsc.MassUpdate.handleChangeCategoryDropDown );
 						});
 					</script>
 				';
+			$add_js = false;
 		}
 		$html .= '<div class="input-group">
 					<div class="input-group-btn" data-content-type="MassUpdate-ChangeCategory" data-content-id="'.$name.'">
@@ -222,18 +254,23 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 		}
 		$html .= '</div>';
 
-		$model_name = $this->attribute->getModel()->getSlugMassUpdate();
-		$group_name = $this->attribute->getGroupName();
-		$attr = $this->attribute->getAttributeCollection();
-		$op = $this->idx;
-		$op_type = $this->getTypeString();
-		$action = 'addCategory';
+		$additional_data = array(
+			'data-model="'.$this->attribute->getModel()->getSlugMassUpdate().'"',
+			'data-group="'.$this->attribute->getGroupName().'"',
+			'data-attr="'.$this->attribute->getAttributeCollection().'"',
+			'data-op="'.$this->idx.'"',
+			'data-op-type="'.$this->getTypeString().'"',
+			'data-action="addCategory"',
+			'data-operation-create="'.$name.'"'
+		);
 		
-		$html .= '<div class="well" data-operation="'.$name.'">
+		$html .= '<div class="well" '.implode( ' ', $additional_data ).'>
 
-				    <h3>Or Add New Category</h3>
-				
-				    <div id="quick-form-response-container"></div>
+                	<div data-toggle="collapse" data-target="#'.$name.'_form" class="btn btn-link">
+                    	Or Add New Category
+                    </div>
+                    <div id="'.$name.'_form" class="collapse">			
+					    <div id="'.$name.'-quick-form-response-container"></div>
 				
 				        <div class="form-group">
 				            <input type="text" name="title" placeholder="Title" class="form-control"/>
@@ -247,7 +284,7 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 				        <!-- /.form-group -->
 				
 				        <div class="form-actions">
-				            <button class="btn btn-primary" data-model="'.$model_name.'">Create</button>
+				            <button class="btn btn-primary">Create</button>
 				        </div>
 				
 				    </form>
@@ -313,5 +350,15 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 			$this->attribute_datetime = $params['attribute_dt'];
 		}
 	}
+	
+	/**
+	 * 
+	 * Adds a category via AJAX request
+	 * 
+	 * @param $request
+	 */
+	public function addCategory($request){
+		$res = array( "result" => $request );
+		return $res;
+	}
 }
-?>

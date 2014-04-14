@@ -100,6 +100,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		}
 		$where_part = $this->processWherePart( $selected_model );
 		$update_operations = $this->processSpecificPart( $selected_model, "update" );
+		
 		$collection = $selected_model->collection();
 		
 		$model_settings = $this->getModel();
@@ -242,12 +243,12 @@ class Updaters extends \Admin\Controllers\BaseAuth
 				} else {
 					$selected_model = $res_op;
 				}
-			}			
+			}	
 
 			$collection->update(
                 			array('_id'=> new \MongoId((string) $selected_model->get('id') ) ),
                 			$selected_model->cast(),
-					   		array('upsert'=>false, 'multiple'=>false)
+					   		array('upsert'=>true, 'multiple'=>false)
 					);
 
 			$stats = \Dsc\System::instance()->get("mongo")->lastError();
@@ -416,7 +417,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		$model_name = $inputFilter->clean( $request['model'], 'string' );
 		$group = $inputFilter->clean( $request['group'], 'alnum' );
 		$attr_name = $inputFilter->clean( $request['attr'], 'alnum' );
-		$op_name = $inputFilter->clean( $request['op'], 'alnum' );
+		$op_index = $inputFilter->clean( $request['op'], 'int' );
 		$op_type = $inputFilter->clean( $request['op_type'], 'alnum' );
 		
 		$service = \Dsc\System::instance()->get( 'massupdate' );
@@ -428,11 +429,11 @@ class Updaters extends \Admin\Controllers\BaseAuth
 			);
 			return $this->getJsonResponse($res);
 		}
-		$op = $model->getOperationMassUpdate( $attr_name, $op, $op_type );
+		$op = $model->getOperationMassUpdate( $attr_name, $op_index, $op_type );
 		if( empty( $model ) ){
 			$res = array(
 					'error' => true,
-					'message' => 'Operation '.$op_name.' (type - '.$op_type.') does not exist in attribute '.$attr_name,
+					'message' => 'Operation at index '.$op_index.' (type - '.$op_type.') does not exist in attribute '.$attr_name,
 			);
 			return $this->getJsonResponse($res);
 		}

@@ -43,15 +43,12 @@ abstract class Group extends \Prefab
 		$this->models[$model_slug] = $model;
 		$model->setConfig( array( "context" => "MassUpdate.".$model->getSlugMassUpdate('.')));
 		$attributes = $model->getMassUpdateOperationGroups();
-		
 		// set mode for all update operations
 		if( count( $attributes ) ){
-			if( !empty( $attributes['update'] ) ) {
-				foreach( $attributes['update'] as $attr ){
-					$attr->setUpdaterMode( $this->mode )
-					->setGroupName( $this->getName() )
-					->setModelSlug( $model_slug );
-				}
+			foreach( $attributes as $attr ){
+				$attr->setUpdaterMode( $this->mode )
+				->setGroupName( $this->getName() )
+				->setModelSlug( $model_slug );
 			}
 		}
 		return $this;

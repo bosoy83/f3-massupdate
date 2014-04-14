@@ -61,12 +61,5 @@ interface Operation{
 	 * @return String representation of name of this option including its index
 	 */
 	public function getNameWithIdx();
-
-	/**
-	 * This method returns unique name for this operation
-	 *  
-	 * @return A unique identifier of this operation
-	 */
-	public function getUniqueName();
 }
 ?>

@@ -95,18 +95,13 @@ class AttributeGroup extends \Prefab
 	 */
 	public function addOperation( $op, $type, $params = array() ){
 		if( $op instanceof \MassUpdate\Operations\Operation ){
-			$name = $op->getUniqueName();
-			if( !empty( $this->operations[$type][$name ]) ){
-				// we already added this operation so lets skip it
-				return $this;
-			}
 			
 			$op->setAttribute( $this );
 			if( !isset( $this->operations[$type] ) ){
 				$this->operations[$type] = array();
 			}			
 			$op->setParams( $params );
-			$this->operations[$type][$name] = $op;
+			$this->operations[$type] []= $op;
 				
 		} else { // warn us, if we pass here instance of an unsupported object
 			throw new \Exception( "Unsupported Operation object" );
@@ -135,19 +130,19 @@ class AttributeGroup extends \Prefab
 	/**
 	 * This method returns specified operation
 	 * 
-	 * @param $name		Name of opeartion
+	 * @param $index	Index of opeartion
 	 * @param $type		Type of operation
 	 * @return Either operation, or NULL in case nothing was found
 	 */
-	public function getOperation( $name, $type ){
+	public function getOperation( $index, $type ){
 		if( empty( $type ) ){
 			return null;
 		} else {
 			if( isset($this->operations[$type] ) ){
-				if( empty( $this->operations[$type][$name] ) ){
+				if( empty( $this->operations[$type][$index] ) ){
 					return null;
 				} else {
-					return $this->operations[$type][$name];
+					return $this->operations[$type][$index];
 				}
 			} else {
 				return null;

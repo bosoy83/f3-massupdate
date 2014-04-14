@@ -81,17 +81,6 @@ trait Operation
 	}
 	
 	/**
-	 * This method returns unique name for this operation
-	 *
-	 * @return A unique identifier of this operation
-	 */
-	public function getUniqueName(){
-		$names = explode( '\\', get_class( $this ) );
-	
-		return array_pop( $names );
-	}
-	
-	/**
 	 * This method handles dispatching request to appropriate method in operation
 	 * 
 	 * @param $request	Array with input data
@@ -102,14 +91,14 @@ trait Operation
 		$action = $this->inputFilter()->clean( trim( $request['action'] ), 'CMD' );
 		$method = new \ReflectionMethod($this, $action );
 		if( $method->isPublic() ){
-			$res = $op->$action( $request );
+			$res = $op->{$action}( $request );
 		} else {
 			$res = array(
 					'error' => true,
 					'message' => 'Operation '.$op_name.' (type - '.$op_type.') in attribute '.$attr_name.' does not contain public method '.$method,
 			);
 		}
-			return $res;
+		return $res;
 	}
 	
 	public function inputFilter(){

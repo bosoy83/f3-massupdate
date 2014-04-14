@@ -22,7 +22,9 @@
 				<td>
 					<div class="form-group clearfix">
 			            <h4><?php echo $op->getLabel() ?></h4>
+						<div data-operation="<?php echo $op->getNameWithIdx(); ?>">
 							<?php echo $op->getFormHtml() ?>
+						</div>
 	        	    </div>
 			    </td>
 			</tr>

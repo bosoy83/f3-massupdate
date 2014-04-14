@@ -24,28 +24,39 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 		}
 		
 		$dataset = $params['dataset'];
-		$data = $this->attribute->getInputFilter()->clean($data, "alnum");
-		$act_user = \Users\Models\Users::collection()->find( array( "_id" => new \MongoId( (string)$data ) ) )->skip(0)->limit(1);
-		if( !$act_user->hasNext() ){
+		if( is_array( $data ) === false ){
 			return null;
 		}
-		$act_user = $act_user->getNext();
-		$res_updates = array(
-			$this->attribute->getAttributeCollection().'.id' => new \MongoId( (string)$data ),
-			$this->attribute->getAttributeCollection().'.name' => $act_user['username']
-		);
+		$categories = array();
+		
+		foreach( $data as $cat ) {
+			$cat = $this->inputFilter()->clean( $cat, 'ALNUM' );
+			if( $cat == 'empty' ){
+				$categories = array();
+				break;
+			}
+			$cat_id = new \MongoId( (string)$cat  );
+			$act_cat = $this->attribute->getModel()->collection()->find( array( "_id" => $cat_id ) )->skip(0)->limit(1);
+			if( !$act_cat->hasNext() ){
+				continue;
+			}
+			$act_cat = $act_cat->getNext();
+			$categories []= array(
+				'id' => $cat_id,
+				'title' => $act_cat['title'],
+				'slug' => $act_cat['slug']
+			);
+		}
 		
 		switch( $this->attribute->getUpdaterMode() ){
 			case 0: // bulk update
 				{
-					return array('$set', $res_updates );
+					return array('$set', array( $this->attribute->getAttributeCollection() => $categories ) );
 				}
 			case 1: // document-by-document
 				{
 					$doc = $params['document'];
-					foreach( $res_updates as $key => $value ) {
-						$doc[$key] = $value;
-					}
+					$doc->set( $this->attribute->getAttributeCollection(), $categories);
 					return $doc;
 				}
 		}
@@ -56,31 +67,39 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 	 */
 	public function getFormHtml(){
 		$categories = $this->attribute->getModel()->emptyState()->populateState()->getItems();
-
-		$js = '<script type="text/javascript">
+		$html = '';
+		$name = $this->getNameWithIdx();
+		static $add_js = true;
+		
+		if( $add_js ){
+			$html = '<script type="text/javascript">
 					Dsc.MassUpdateChangeCategoryAddCategory = function( ev ){
 						$this = jQuery( ev.currentTarget );
 						var url_link = "./admin/massupdate/updaters/ajax";
-				
+			
 				        var request = jQuery.ajax({
-				            type: "POST", 
+				            type: "POST",
 				            url: url_link,
 				            data: form_data
 				        }).done(function(data){
 				            var r = jQuery.parseJSON( JSON.stringify(data), false);
 				            console.log( r );
 				        }).fail(function(data){
-				
+			
 				        }).always(function(data){
-				
+			
 				        });
-				
+			
 					}
+					
+					jQuery(function() {
+						jQuery( "div[data-operation="'.$name.'"] ).on( "click", Dsc.MassUpdateChangeCategoryAddCategory );
+					});
 				</script>
 				';
+		}
 		
-		$html = '<div class="max-height-200 list-group-item">';
-		$html .= '
+		$html .= '<div class="max-height-200 list-group-item">
 					<div class="checkbox">
 						<label>
 							<input type="checkbox" name="'.$this->getNameWithIdx().'[]" class="icheck-input" value="empty">
@@ -101,7 +120,64 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 					</div>
 					';
 		}
+		$html .= '</div>';
+
+		$model_name = $this->attribute->getModel()->getSlugMassUpdate();
+		$group_name = $this->attribute->getGroupName();
+		$attr = $this->attribute->getAttributeCollection();
+		$op = $this->idx;
+		$op_type = $this->getTypeString();
+		$action = 'addCategory';
+		
+		$html .= '<div class="well" data-operation="'.$name.'">
+
+				    <h3>Or Add New Category</h3>
 				
+				    <div id="quick-form-response-container"></div>
+				
+				        <div class="form-group">
+				            <input type="text" name="title" placeholder="Title" class="form-control"/>
+				        </div>
+				        <!-- /.form-group -->
+				
+				        <div id="parents" class="form-group">
+							<label>Parent</label> 
+							'.$this->getParentSelectHtml($categories).'
+				        </div>
+				        <!-- /.form-group -->
+				
+				        <div class="form-actions">
+				            <button class="btn btn-primary" data-model="'.$model_name.'">Create</button>
+				        </div>
+				
+				    </form>
+				
+				</div>';
+		
+		return $html;
+	}
+	
+	/**
+	 * This method will generate html code for select
+	 * 
+	 * @param $categories	Array with categores, If empty, categores will be fetched from db
+	 * 
+	 * @return String with html code for select
+	 */
+	private function getParentSelectHtml($categories = ''){
+		if( empty( $categories ) ){
+			$categories = $this->attribute->getModel()->emptyState()->populateState()->getItems();
+		}
+		
+		$html  = '<select name="parent" class="form-control">
+					<option value="null">None</option>';
+
+		foreach ($categories as $one) {
+			$html .= '<option value="'.$one->_id.'" >';
+			$html .= @str_repeat( "&ndash;", substr_count( @$one->path, "/" ) - 1 ) . " " . $one->title;;
+			$html .= '</option>';
+		}
+		$html .= '</select>';
 		return $html;
 	}
 	
@@ -110,8 +186,8 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 	 * operation in form
 	 */
 	public function getGenericLabel(){
-		return "New Category is";
-	}
+		return "Move to category";
+	}	
 	
 	/**
 	 * This methods sets additional parameters for this operation

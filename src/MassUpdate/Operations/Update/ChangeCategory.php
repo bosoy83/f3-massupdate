@@ -27,6 +27,7 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 		if( is_array( $data ) === false ){
 			return null;
 		}
+		
 		$categories = array();
 		
 		foreach( $data as $cat ) {
@@ -48,17 +49,49 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 			);
 		}
 		
-		switch( $this->attribute->getUpdaterMode() ){
-			case 0: // bulk update
-				{
-					return array('$set', array( $this->attribute->getAttributeCollection() => $categories ) );
+		$name_with_idx = $this->getNameWithIdx();
+		$mode = $dataset[$name_with_idx.'_mode'];
+		
+		switch( $mode) {
+			case 'replace':
+				switch( $this->attribute->getUpdaterMode() ){
+					case 0: // bulk update
+						{
+							return array('$set', array( $this->attribute->getAttributeCollection() => $categories ) );
+						}
+					case 1: // document-by-document
+						{
+							$doc = $params['document'];
+							$doc->set( $this->attribute->getAttributeCollection(), $categories);
+							return $doc;
+						}
 				}
-			case 1: // document-by-document
-				{
-					$doc = $params['document'];
-					$doc->set( $this->attribute->getAttributeCollection(), $categories);
-					return $doc;
+				break;
+			case 'add':
+				switch( $this->attribute->getUpdaterMode() ){
+					case 0: // bulk update
+						{
+							return array('$push', array( $this->attribute->getAttributeCollection() => 
+													array( '$each' => $categories ) ) );
+						}
+					case 1: // document-by-document
+						{
+							$doc = $params['document'];
+							$act_cats =  $doc->get( $this->attribute->getAttributeCollection());
+							if( count( $categories ) > 0 ){
+								foreach( $categories as $cat ){
+									$act_cats []= $cat;
+								}
+							}
+							
+							$doc->set( $this->attribute->getAttributeCollection(), $act_cats);
+							return $doc;
+						}
 				}
+				break;
+			case 'remove':
+				break;	
+			
 		}
 	}
 	
@@ -120,6 +153,7 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 					</div>
 					';
 		}
+		$html .= '<input type="hidden" name="'.$this->getNameWithIdx().'_mode" value="add">';
 		$html .= '</div>';
 
 		$model_name = $this->attribute->getModel()->getSlugMassUpdate();

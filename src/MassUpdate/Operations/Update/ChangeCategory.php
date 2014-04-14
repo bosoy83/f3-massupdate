@@ -100,13 +100,28 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 						{
 							$doc = $params['document'];
 							$act_cats =  $doc->get( $this->attribute->getAttributeCollection());
-							if( count( $categories ) > 0 ){
-								foreach( $categories as $cat ){
-									$act_cats []= $cat;
+							if( count( $act_cats ) > 0 ){
+								if( count( $categories ) > 0 ){
+									$list_unset = array();
+									
+									foreach( $categories as $cat ){
+										foreach( $act_cats as $idx=>$act ){
+											if( (string)($act['id']) == 
+												(string)($cat['id']) ){
+												$list_unset []= $idx;
+											}
+										}
+									}
+									
+									if( count( $list_unset ) > 0 ){
+										foreach( $list_unset as $val ){
+											unset($act_cats[$val]);
+										}
+									}
 								}
+								$doc->set( $this->attribute->getAttributeCollection(), $act_cats);
 							}
 								
-							$doc->set( $this->attribute->getAttributeCollection(), $act_cats);
 							return $doc;
 						}
 				}
@@ -174,7 +189,7 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 					</div>
 					';
 		}
-		$html .= '<input type="hidden" name="'.$this->getNameWithIdx().'_mode" value="add">';
+		$html .= '<input type="hidden" name="'.$this->getNameWithIdx().'_mode" value="remove">';
 		$html .= '</div>';
 
 		$model_name = $this->attribute->getModel()->getSlugMassUpdate();

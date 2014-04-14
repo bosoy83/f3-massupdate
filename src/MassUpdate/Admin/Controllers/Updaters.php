@@ -244,7 +244,6 @@ class Updaters extends \Admin\Controllers\BaseAuth
 					$selected_model = $res_op;
 				}
 			}	
-
 			$collection->update(
                 			array('_id'=> new \MongoId((string) $selected_model->get('id') ) ),
                 			$selected_model->cast(),
@@ -274,7 +273,6 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		$result = array();
 		$attr_groups = $selected_model->getMassUpdateOperationGroups();
 		$request = \Base::instance()->get('REQUEST');
-	
 		if( count( $attr_groups ) > 0 ){
 			foreach( $attr_groups as $attr ){
 				// replace all dots with underscores
@@ -299,7 +297,6 @@ class Updaters extends \Admin\Controllers\BaseAuth
 				$result []= array( $operations[$opt], $data, $opt );
 			}
 		}
-	
 		return $result;
 	}
 	

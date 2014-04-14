@@ -90,6 +90,27 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 				}
 				break;
 			case 'remove':
+				switch( $this->attribute->getUpdaterMode() ){
+					case 0: // bulk update
+						{
+							return array('$pull', array( $this->attribute->getAttributeCollection() =>
+									array( '$in' => $categories ) ) );
+						}
+					case 1: // document-by-document
+						{
+							$doc = $params['document'];
+							$act_cats =  $doc->get( $this->attribute->getAttributeCollection());
+							if( count( $categories ) > 0 ){
+								foreach( $categories as $cat ){
+									$act_cats []= $cat;
+								}
+							}
+								
+							$doc->set( $this->attribute->getAttributeCollection(), $act_cats);
+							return $doc;
+						}
+				}
+								
 				break;	
 			
 		}

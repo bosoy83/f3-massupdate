@@ -20,8 +20,8 @@ class Contains extends \MassUpdate\Operations\Condition{
 		
 		$data = $this->inputFilter()->clean($data, "string");
 		$res_clause = new \MassUpdate\Service\Models\Clause();
-		$res_clause->{'filter'} = $this->filter;
-		$res_clause->{'val'} = $data;
+		$res_clause->filter = $this->filter;
+		$res_clause->val =  $data;
 		return $res_clause;
 	}
 	

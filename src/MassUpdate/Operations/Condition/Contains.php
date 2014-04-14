@@ -18,7 +18,7 @@ class Contains extends \MassUpdate\Operations\Condition{
 			return null;
 		}
 		
-		$data = $this->attribute->getInputFilter()->clean($data, "string");
+		$data = $this->inputFilter()->clean($data, "string");
 		$res_clause = new \MassUpdate\Service\Models\Clause();
 		$res_clause->{'filter'} = $this->filter;
 		$res_clause->{'val'} = $data;

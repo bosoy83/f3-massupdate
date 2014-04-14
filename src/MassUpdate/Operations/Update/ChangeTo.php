@@ -16,7 +16,7 @@ class ChangeTo extends \MassUpdate\Operations\Update{
 	 * @return	Based on mode of updater, either update clause or updated document
 	 */
 	public function getUpdateClause($data, $params = array() ){
-		$data = $this->attribute->getInputFilter()->clean($data, "alnum");
+		$data = $this->inputFilter()->clean($data, "alnum");
 		
 		switch( $this->attribute->getUpdaterMode() ){
 			case 0: // buk update

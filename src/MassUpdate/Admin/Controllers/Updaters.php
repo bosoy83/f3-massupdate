@@ -38,7 +38,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 					foreach( $m as $model ){
 						$models []= array(
 								'slug' => $model->getSlugMassUpdate(),
-								'updater' => $updater->slug,
+								'updater' => $updater->getName(),
 								'title' => $model->getTitleMassUpdate(),
 								'title_updater' => $updater->title
 						);
@@ -394,10 +394,49 @@ class Updaters extends \Admin\Controllers\BaseAuth
 	
 	/**
 	 * This method handles AJAX requests from operations and dispatches them further
+	 * 
+	 * @param	$f3		Base application
 	 */
-	public function doAjax(){
+	public function doAjax($f3){
 		// first of all, lets check, if we know where and what do we want to dispatch
+		$request = $f3->get( "POST" );
+		if( empty( $request['model'] ) || 
+			empty( $request['group'] ) ||
+			empty( $request['attr']) ||
+			empty( $request['op']) ||
+			empty( $request['op_type'])){
+			$res = array(
+				'error' => true,
+				'message' => 'There is not enough information',
+			);
+			return $this->getJsonResponse($res);
+		}
+		$inputFilter = \Dsc\System::instance()->get('inputfilter');
 		
+		$model_name = $inputFilter->clean( $request['model'], 'string' );
+		$group = $inputFilter->clean( $request['group'], 'alnum' );
+		$attr_name = $inputFilter->clean( $request['attr'], 'alnum' );
+		$op_name = $inputFilter->clean( $request['op'], 'alnum' );
+		$op_type = $inputFilter->clean( $request['op_type'], 'alnum' );
 		
+		$service = \Dsc\System::instance()->get( 'massupdate' );
+		$model = $service->getModel( $model_name, $group );
+		if( empty( $model ) ){
+			$res = array(
+				'error' => true,
+				'message' => 'Model '.$model_name.' does not exist',
+			);
+			return $this->getJsonResponse($res);
+		}
+		$op = $model->getOperationMassUpdate( $attr_name, $op, $op_type );
+		if( empty( $model ) ){
+			$res = array(
+					'error' => true,
+					'message' => 'Operation '.$op_name.' (type - '.$op_type.') does not exist in attribute '.$attr_name,
+			);
+			return $this->getJsonResponse($res);
+		}
+		$response = $op->handleAjax( $request );
+		return $this->getJsonResponse($response);
 	}
 }

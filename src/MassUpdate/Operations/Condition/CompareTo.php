@@ -14,7 +14,7 @@ class CompareTo extends \MassUpdate\Operations\Condition{
 	 * @param	$params		Arrays with possible additional params (for different modes of updater
 	 */
 	public function getWhereClause($data, $params = array()){
-		$data = $this->attribute->getInputFilter()->clean($data, "alnum");
+		$data = $this->inputFilter()->clean($data, "alnum");
 		$res_clause = new \MassUpdate\Service\Models\Clause();
 		// check required parameters
 		if( !$this->checkParams( $params ) ){

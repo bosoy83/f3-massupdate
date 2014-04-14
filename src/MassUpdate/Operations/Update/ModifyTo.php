@@ -20,7 +20,7 @@ class ModifyTo extends \MassUpdate\Operations\Update{
 		if( !$this->checkParams( $params ) ){
 			return null;
 		}
-		$data = $this->attribute->getInputFilter()->clean($data, "string");
+		$data = $this->inputFilter()->clean($data, "string");
 		
 		switch( $this->attribute->getUpdaterMode() ){
 			case 0: // bulk update

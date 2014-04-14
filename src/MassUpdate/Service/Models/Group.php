@@ -7,12 +7,12 @@ namespace MassUpdate\Service\Models;
 abstract class Group extends \Prefab 
 {
 	protected $name;
+	protected $mode;
 	
 	/**
 	 * Title of this group
 	 */
 	public $title;
-	public $slug;
 	
 	/**
 	 * All models registered for mass update from this gruop
@@ -24,26 +24,34 @@ abstract class Group extends \Prefab
 	 * 
 	 * @param	$mode	Mode of updater
 	 */
-	public abstract function initialize($mode);
+	public function initialize($mode){
+		$this->mode = $mode;
+	}
 	
 	/**
 	 * Adds a model into group
 	 * 
 	 * @param $model Model to be added into the group
-	 * @param	$mode	Mode of updater
 	 * 
 	 * @return Instance of this class to support chaining of commands
 	 */
-	protected function addModel( $model, $mode ){
-		$this->models []= $model;
+	protected function addModel( $model ){
+		$model_slug = $model->getSlugMassUpdate();
+		if( !empty( $this->models[ $model_slug ] ) ){
+			throw new \Exception( "Model with this slug - ".$model_slug." - already exists in Mass Update" );
+		} 
+		$this->models[$model_slug] = $model;
 		$model->setConfig( array( "context" => "MassUpdate.".$model->getSlugMassUpdate('.')));
 		$attributes = $model->getMassUpdateOperationGroups();
 		
 		// set mode for all update operations
 		if( count( $attributes ) ){
-			foreach( $attributes as $attr ){
-				$attr->setUpdaterMode( $mode )
-					->setGroupName( $this->getName());
+			if( !empty( $attributes['update'] ) ) {
+				foreach( $attributes['update'] as $attr ){
+					$attr->setUpdaterMode( $this->mode )
+					->setGroupName( $this->getName() )
+					->setModelSlug( $model_slug );
+				}
 			}
 		}
 		return $this;

@@ -22,7 +22,7 @@ class Category extends \MassUpdate\Operations\Condition{
 		$ids = array();
 		$empty_categories = false;
 		foreach( $data as $id ){
-			$id = $this->attribute->getInputFilter()->clean($id, "string");
+			$id = $this->inputFilter()->clean($id, "string");
 			if( $id == 'empty' ){
 				$empty_categories = true;
 				continue;

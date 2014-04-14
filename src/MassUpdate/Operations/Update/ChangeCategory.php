@@ -2,12 +2,12 @@
 namespace MassUpdate\Operations\Update;
 
 /**
- * Changes user
+ * Changes category
  * 
  */
-class ChangeUser extends \MassUpdate\Operations\Update{
+class ChangeCategory extends \MassUpdate\Operations\Update{
 
-	private $mode; // 0 => only date, 1 => date + time
+	private $allow_add; // false => disables adding a new category, 1 => allows adding a new category
 	
 	/**
 	 * This method returns update clause which will be later on passed to collection
@@ -24,7 +24,7 @@ class ChangeUser extends \MassUpdate\Operations\Update{
 		}
 		
 		$dataset = $params['dataset'];
-		$data = $this->inputFilter()->clean($data, "alnum");
+		$data = $this->attribute->getInputFilter()->clean($data, "alnum");
 		$act_user = \Users\Models\Users::collection()->find( array( "_id" => new \MongoId( (string)$data ) ) )->skip(0)->limit(1);
 		if( !$act_user->hasNext() ){
 			return null;
@@ -55,29 +55,53 @@ class ChangeUser extends \MassUpdate\Operations\Update{
 	 * This method returns string representation how the operation should be rendered in form
 	 */
 	public function getFormHtml(){
-		static $users = array();
-		if( count( $users ) == 0 ){
-			$users_model = new \Users\Models\Users();
-			$users_model->setConfig( array( 'context' => 'MassUpdate.'.$this->getNameWithIdx() ) );
-			$users = $users_model->emptyState()->populateState()->getItems();
-		}
+		$categories = $this->attribute->getModel()->emptyState()->populateState()->getItems();
+
+		$js = '<script type="text/javascript">
+					Dsc.MassUpdateChangeCategoryAddCategory = function( ev ){
+						$this = jQuery( ev.currentTarget );
+						var url_link = "./admin/massupdate/updaters/ajax";
+				
+				        var request = jQuery.ajax({
+				            type: "POST", 
+				            url: url_link,
+				            data: form_data
+				        }).done(function(data){
+				            var r = jQuery.parseJSON( JSON.stringify(data), false);
+				            console.log( r );
+				        }).fail(function(data){
+				
+				        }).always(function(data){
+				
+				        });
+				
+					}
+				</script>
+				';
 		
-		$html = '';
-		$name_with_idx = $this->getNameWithIdx();
-		
+		$html = '<div class="max-height-200 list-group-item">';
 		$html .= '
-					<div class="pull-left">
-						<div class="input-group col-md-8 pull-left">
-							<select name="'.$this->getNameWithIdx().'" id="'.$this->getNameWithIdx().'">';
-		if( count( $users ) > 0 ){
-			foreach( $users as $user ){
-				$html .= '<option value="'.$user['_id'].'">'.$user['first_name'].' '.$user['last_name'].'</option>';
-			}
-		}
-		$html .= '			</select>
-						</div>
-					</div>';
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" name="'.$this->getNameWithIdx().'[]" class="icheck-input" value="empty">
+							- No Category Assigned -
+						</label>
+					</div>
+					';
 		
+		foreach ($categories as $one) {
+			$dash = @str_repeat( "&ndash;", substr_count( @$one->path, "/" ) - 1 );
+			
+			$html .= '
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" name="'.$this->getNameWithIdx().'[]" class="icheck-input" value="'.$one->_id.'">
+							'.$dash.' '.$one->title.'
+					    </label>
+					</div>
+					';
+		}
+				
 		return $html;
 	}
 	
@@ -86,7 +110,7 @@ class ChangeUser extends \MassUpdate\Operations\Update{
 	 * operation in form
 	 */
 	public function getGenericLabel(){
-		return "Select User";
+		return "New Category is";
 	}
 	
 	/**
@@ -97,10 +121,10 @@ class ChangeUser extends \MassUpdate\Operations\Update{
 	 */
 	public function setParams( $params ){
 		parent::setParams( $params );
-		if( empty( $params['mode'] ) ){
-			$this->mode = 0;
+		if( empty( $params['allow_add'] ) ){
+			$this->allow_add = false;
 		} else {
-			$this->mode = $params['mode'];
+			$this->allow_add = $params['allow_add'];
 		}
 		
 		if( empty( $params[ 'metastamp' ]) ){

@@ -38,6 +38,11 @@ class AttributeGroup extends \Prefab
 	protected $updater_mode;
 	
 	/**
+	 * Model slug (identifies model to which this attribute group belongs)
+	 */
+	protected $model_slug;
+	
+	/**
 	 * This method sets name of attribute in collection for this group of operations
 	 * 
 	 * @param $attr Name in collection
@@ -90,14 +95,19 @@ class AttributeGroup extends \Prefab
 	 */
 	public function addOperation( $op, $type, $params = array() ){
 		if( $op instanceof \MassUpdate\Operations\Operation ){
+			$name = $op->getUniqueName();
+			if( !empty( $this->operations[$type][$name ]) ){
+				// we already added this operation so lets skip it
+				return $this;
+			}
+			
 			$op->setAttribute( $this );
 			if( !isset( $this->operations[$type] ) ){
 				$this->operations[$type] = array();
-			}
-			$this->operations[$type] []= $op;
+			}			
 			$op->setParams( $params );
-			
-			
+			$this->operations[$type][$name] = $op;
+				
 		} else { // warn us, if we pass here instance of an unsupported object
 			throw new \Exception( "Unsupported Operation object" );
 		}
@@ -110,21 +120,39 @@ class AttributeGroup extends \Prefab
 	 * 
 	 * @return Array of all operations for this group
 	 */
-	public function getOperations($type){
-		if( !isset($this->operations[$type] ) ){
-			return array();
+	public function getOperations($type = ''){
+		if( empty( $type ) ){
+			return $this->operations;
 		} else {
-			return $this->operations[$type];
+			if( !isset($this->operations[$type] ) ){
+				return array();
+			} else {
+				return $this->operations[$type];
+			}
 		}
 	}
 	
 	/**
-	 * This method returns instance of input filter assigned to this attribute group
-	 *
-	 * @return Instance of InputFilter
+	 * This method returns specified operation
+	 * 
+	 * @param $name		Name of opeartion
+	 * @param $type		Type of operation
+	 * @return Either operation, or NULL in case nothing was found
 	 */
-	public function getInputFilter(){
-		return \Dsc\System::instance()->get('inputfilter');
+	public function getOperation( $name, $type ){
+		if( empty( $type ) ){
+			return null;
+		} else {
+			if( isset($this->operations[$type] ) ){
+				if( empty( $this->operations[$type][$name] ) ){
+					return null;
+				} else {
+					return $this->operations[$type][$name];
+				}
+			} else {
+				return null;
+			}
+		}
 	}
 	
 	/**
@@ -188,5 +216,26 @@ class AttributeGroup extends \Prefab
 	 */
 	public function getGroupName(){
 		return $this->group_name;
+	}
+
+	/**
+	 * This method sets identifier for model
+	 *
+	 * @param $slug	Slug for the model
+	 *
+	 * @return	Pointer to this instance in order to support chaining
+	 */
+	public function setModelSlug($slug){
+		$this->model_slug = $slug;
+		return $this;
+	}
+	
+	/**
+	 * This method gets identifier for model
+	 *
+	 * @return Slug for the model
+	 */
+	public function getModelSlug(){
+		return $this->model_slug;
 	}
 }

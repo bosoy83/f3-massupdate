@@ -7,6 +7,8 @@ namespace MassUpdate\Operations;
  */
 abstract class Update implements \MassUpdate\Operations\Operation{
 
+	use \MassUpdate\Service\Traits\Operation;
+	
 	/**
 	 * Type of this operation
 	 */
@@ -49,56 +51,9 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 	public abstract function getFormHtml();
 	
 	/**
-	 * This method sets attribute for this operation
-	 * 
-	 * @param $attr		Attribute in collection
-	 * 
-	 * @return Instance of this class in order to support chaining of operations
-	 */
-	public function setAttribute($attr){
-		$this->attribute = $attr;
-		
-		return $this;
-	}
-
-	/**
-	 * This method returns attribute for this operation
-	 *
-	 * @return Attribute for this operation
-	 */
-	public function getAttribute(){
-		return $this->attribute;
-	}
-	
-	/**
-	 * This method returns label for getFormHtml() element which should be used as a label for this
-	 * operation in form
-	 */
-	public function getLabel(){
-		if( strlen( $this->custom_label ) ){
-			return $this->custom_label;
-		} else {
-			return $this->getGenericLabel();
-		}
-	}
-
-	/**
 	 * This method returns generic labal in case a custom label was not defined
 	 */
 	public abstract function getGenericLabel();
-	
-	/**
-	 * This method sets index of this operation in list of all of them
-	 * 
-	 * @param $index	Index in the array
-	 * 
-	 * @return Instance of this class in order to support chaining of operations
-	 */
-	public function setIndex($index){
-		$this->idx = $index;
-		
-		return $this;
-	}
 
 	/**
 	 * This methods sets additional parameters for this operation
@@ -112,15 +67,6 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 				$this->custom_label = $params['custom_label'];
 			}
 		}
-	}
-
-	/**
-	 * This method returns string representation of type of the operation
-	 *
-	 * @return String representation of type of the operation (where or update)
-	 */
-	public function getTypeString(){
-		return $this->type;
 	}
 	
 	/**
@@ -143,15 +89,6 @@ abstract class Update implements \MassUpdate\Operations\Operation{
 			return false;
 		}
 		return true;
-	}
-	
-	/**
-	 * This method returns representation of name of this option including its index
-	 *
-	 * @return String representation of name of this option including its index
-	 */
-	public function getNameWithIdx(){
-		return str_replace( '.', '_', $this->attribute->getAttributeCollection() ) .'_'.$this->getTypeString().'_'.$this->idx;
 	}
 }
 ?>

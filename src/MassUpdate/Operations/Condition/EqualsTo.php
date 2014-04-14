@@ -17,7 +17,7 @@ class EqualsTo extends \MassUpdate\Operations\Condition{
 		if( !$this->checkParams( $params ) ){
 			return null;
 		}
-		$data = $this->attribute->getInputFilter()->clean($data, "alnum");
+		$data = $this->inputFilter()->clean($data, "alnum");
 
 		$res_clause = new \MassUpdate\Service\Models\Clause();
 		$res_clause->{'key'} = $this->attribute->getAttributeCollection();

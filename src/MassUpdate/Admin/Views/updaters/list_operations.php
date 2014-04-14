@@ -1,6 +1,6 @@
 <table class="table table-striped" data-type="<?php echo $type; ?>">
 <?php if( count( $attributes ) ) {
-	 foreach( $attributes as $attr ){ 
+	foreach( $attributes as $attr ){ 
 		$ops = $attr->getOperations($type);
 		if( count( $ops ) > 0 ) {
 		?>

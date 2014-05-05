@@ -37,7 +37,7 @@ Dsc.MassUpdate.UpdateSelectUpdaters = function(selected){
 		} ).appendTo( Dsc.MassUpdate.Elements.select_updater );
 
 	for( i = 0; i < Dsc.MassUpdate.Updaters.length; i++ ) {
-		var link = "./admin/massupdate/updaters/" + Dsc.MassUpdate.Updaters[i]['slug'];
+		var link = "/admin/massupdate/updaters/" + Dsc.MassUpdate.Updaters[i]['slug'];
 		var opt = $('<option></option>', 
 				{
 					'text' : Dsc.MassUpdate.Updaters[i]['title'],
@@ -65,7 +65,7 @@ Dsc.MassUpdate.UpdateSelectModels = function(selected_model, selected_updater){
 
 	for( i = 0; i < Dsc.MassUpdate.Models.length; i++ ) {
 		if( Dsc.MassUpdate.Models[i]['updater_slug'] == selected_updater ) {
-			var link = "./admin/massupdate/updaters/" 
+			var link = "/admin/massupdate/updaters/" 
 							+ Dsc.MassUpdate.Models[i]['updater_slug'] + "/"
 							+ Dsc.MassUpdate.Models[i]['model_slug'];
 			var opt = $('<option></option>', 
@@ -166,7 +166,7 @@ jQuery(function(){
 		event.preventDefault();
 		$this = jQuery(event.currentTarget);
 		var mode_num = $this.data('updater-mode');
-		var link_url = './admin/massupdate/settings/mode/'+mode_num;
+		var link_url = '/admin/massupdate/settings/mode/'+mode_num;
 	    var request = jQuery.ajax({
 	        type: 'get', 
 	        url: link_url

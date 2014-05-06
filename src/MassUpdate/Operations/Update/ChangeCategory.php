@@ -156,7 +156,7 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 								"parent" : jQuery( "#parents select option:selected", $this).val(),
 								"title" : jQuert( "input[name=\"title\"", $this ).val()
 								};
-						var url_link = "/admin/massupdate/updaters/ajax";
+						var url_link = "./admin/massupdate/updaters/ajax";
 			
 				        var request = jQuery.ajax({
 				            type: "POST",
@@ -180,7 +180,7 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 
                             var request = jQuery.ajax({
                                 type: \'post\', 
-                                url: \'/admin/shop/categories/checkboxes\',
+                                url: \'./admin/shop/categories/checkboxes\',
                                 data: form_data
                             }).done(function(data){
                                 var lr = jQuery.parseJSON( JSON.stringify(data), false);

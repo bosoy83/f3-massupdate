@@ -5,21 +5,30 @@ class Listener extends \Prefab
 {
     public function onSystemRebuildMenu( $event )
     {
-        if ($mapper = $event->getArgument('mapper')) 
-        {
-            $mapper->reset();
-            $mapper->priority = 40;
-            $mapper->id = 'f3-redirect';
-            $mapper->title = 'Mass Update';
-            $mapper->route = '';
-            $mapper->icon = 'fa fa-signal';
-            $mapper->children = array(
-                    json_decode(json_encode(array( 'title'=>'List Updaters', 'route'=>'/admin/massupdate/updaters', 'icon'=>'fa fa-list' )))
-                    ,json_decode(json_encode(array( 'title'=>'Settings', 'route'=>'/admin/massupdate/settings', 'icon'=>'fa fa-cogs' )))
+    	if ($model = $event->getArgument('model'))
+    	{
+    		$root = $event->getArgument( 'root' );
+    		$update = clone $model;
+    	
+    		$update->insert(
+    				array(
+    						'type'	=> 'admin.nav',
+    						'priority' => 60,
+    						'title'	=> 'Mass Update',
+    						'icon'	=> 'fa fa-signal',
+        					'is_root' => false,
+    						'tree'	=> $root,
+    						'base' => '/admin/massupdate/',
+    				)
+    		);
+    		
+            $children = array(
+                    array( 'title'=>'List Updaters', 'route'=>'/admin/massupdate/updaters', 'icon'=>'fa fa-list' ),
+                    array( 'title'=>'Settings', 'route'=>'/admin/massupdate/settings', 'icon'=>'fa fa-cogs' ),
             );
-            $mapper->save();
+           	$update->addChildrenItems( $children, $root, $model );
             
-            \Dsc\System::instance()->addMessage('Routes Manager added its admin menu items.');
+            \Dsc\System::instance()->addMessage('Mass Update added its admin menu items.');
         }
     }
 }

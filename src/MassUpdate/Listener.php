@@ -26,7 +26,7 @@ class Listener extends \Prefab
                     array( 'title'=>'List Updaters', 'route'=>'/admin/massupdate/updaters', 'icon'=>'fa fa-list' ),
                     array( 'title'=>'Settings', 'route'=>'/admin/massupdate/settings', 'icon'=>'fa fa-cogs' ),
             );
-           	$update->addChildrenItems( $children, $root, $model );
+           	$update->addChildrenItems( $children, $root );
             
             \Dsc\System::instance()->addMessage('Mass Update added its admin menu items.');
         }

@@ -2,8 +2,9 @@
 
 namespace MassUpdate\Service\Models;
 
-class App extends \Prefab{
+abstract class App extends \Prefab{
 
+	protected $name;
 	protected $mode;
 	
 	/**
@@ -65,8 +66,7 @@ class App extends \Prefab{
 	 * @return	Name of this group
 	 */
 	public function getName(){
-		$parts = explode( '\\', get_class( $this ) );
-		return $parts[count( $parts ) - 2];
+		return $this->name;
 	}
 	
 	/**

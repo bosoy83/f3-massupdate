@@ -16,18 +16,20 @@ class MassUpdate extends \Prefab
 		
 		// get current mode from Settings model
 		$settings = \MassUpdate\Admin\Models\Settings::fetch();
-		$path = __DIR__ . '/../Apps/';
-		if ($folders = \Joomla\Filesystem\Folder::folders( $path ))
-		{
-			foreach ($folders as $folder)
+		$paths = \Base::instance()->get('dsc.massupdate.paths');
+		
+		if( !empty( $paths ) ){
+			foreach ($paths as $path)
 			{
-				if (file_exists( $path . $folder . '/App.php' )) {
-					$classname = '\\MassUpdate\\Apps\\'.$folder.'\\App';
-					$app = new $classname;
-					$res = $app->initialize($settings->{'general.updater_mode'});
-					
-					if( $res ) {
-						$this->list_apps[$app->getName()] = $app;
+				if (file_exists( $path . '/App.php' )) {
+					$app = null;
+					require $path . '/App.php';
+					if( $app != null ){
+						$res = $app->initialize($settings->{'general.updater_mode'});
+							
+						if( $res ) {
+							$this->list_apps[$app->getName()] = $app;
+						}
 					}
 				}
 			}
@@ -92,5 +94,4 @@ class MassUpdate extends \Prefab
 		}
 		return $res;
 	}
-
 }

@@ -28,7 +28,7 @@ class Manufacturers extends \MassUpdate\Service\Models\Model {
     		->setParentModel( $this )
     		->setAttributeTitle( "Manufacturer Name" )
     		->addOperation( new \MassUpdate\Operations\Condition\EqualsTo)
-    		->addOperation( new \MassUpdate\Operations\Update\ModifyTo);
+    		->addOperation( new \MassUpdate\Operations\Update\ChangeTo);
 					
 			$this->addAttributeGroup( $attr_title );
 		}

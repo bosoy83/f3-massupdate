@@ -1,30 +1,32 @@
 <?php 
-namespace MassUpdate\Operations\Condition;
+namespace MassUpdate\Apps\Shop\Operations\Condition;
 
 /**
- * Checks, if a field (of boolean type) matches the expected value
+ * Checks, if a field is published or not
  * 
  */
-class Boolean extends \MassUpdate\Operations\Condition{
+class PublicationStatus extends \MassUpdate\Operations\Condition{
 
 	/**
 	 * This method returns where clause which will be later on passed to collection
 	 * 
 	 * @param 	$data		Data from request
-	 * @param	$params		Arrays with possible additional params (for different modes of updater
+	 * @param	$params		Arrays with possible additional params (for different modes of updater)
 	 */
 	public function getWhereClause($data, $params = array()){
 		if( !$this->checkParams( $params ) ){
 			return null;
 		}
+		$data = $this->attribute->getInputFilter()->clean($data, "alnum");
+		$values = array( "published", "unpublished" );
 		
-		$data = (string)((int)$data);
+		if( in_array( $data, $values ) === false ){ // not a possible value
+			return null;
+		}
+		
 		$res_clause = new \MassUpdate\Service\Models\Clause();
-		$res_clause->{'key'} = '$or';
-		$res_clause->{'val'} = array( 
-								array( $this->attribute->getAttributeCollection() => $data == '1' ),
-								array( $this->attribute->getAttributeCollection() => $data )
-								);
+		$res_clause->{'key'} = $this->attribute->getAttributeCollection();		
+		$res_clause->{'val'} = $data;
 		return $res_clause;
 	}
 	
@@ -35,10 +37,10 @@ class Boolean extends \MassUpdate\Operations\Condition{
 		$name = $this->attribute->getAttributeCollection();
 		$html = '
 				<select name="'.$this->getNameWithIdx().'" id="'.$this->getNameWithIdx().'" class="form-control">
-					<option value="1">True</option>
-					<option value="0">False</option>
+					<option value="published">Published</option>
+					<option value="unpublished">Unpublished</option>
 				</select>
-				';
+				';		
 		
 		return $html;
 	}
@@ -48,12 +50,12 @@ class Boolean extends \MassUpdate\Operations\Condition{
 	 * operation in form
 	 */
 	public function getGenericLabel(){
-		return "Boolean value is";
+		return "Published Status is";
 	}
 
 	/**
 	 * This method returns nature of this operation - whether it uses mdoel's filter or generates its own where clause statement
-	 *
+	 * 
 	 * @return True if it uses model's filter
 	 */
 	public function getNatureOfOperation(){

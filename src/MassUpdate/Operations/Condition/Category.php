@@ -87,7 +87,7 @@ class Category extends \MassUpdate\Operations\Condition{
 	 * This method returns string representation how the operation should be rendered in form
 	 */
 	public function getFormHtml(){
-		$categories = $this->attribute->getModel()->emptyState()->populateState()->getItems();
+		$categories = $this->model->emptyState()->populateState()->getItems();
 
 		$html = '<div class="max-height-200 list-group-item">';
 		$html .= '
@@ -148,6 +148,12 @@ class Category extends \MassUpdate\Operations\Condition{
 			}
 			
 			$this->mode = $params['mode'];
+		}
+			
+		if( empty( $params[ 'model' ]) ){
+			$this->model = new \Dsc\Mongo\Collections\Categories;
+		} else {
+			$this->model = $params[ 'model' ];
 		}
 	}
 }

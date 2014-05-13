@@ -1,37 +1,30 @@
 <?php 
-namespace MassUpdate\Operations\Update;
+namespace MassUpdate\Apps\Shop\Operations\Update;
 
 /**
- * Updates boolean value in the field
+ * Checks, if a field is published or not
  * 
  */
-class Boolean extends \MassUpdate\Operations\Update{
-
+class PublicationStatus extends \MassUpdate\Operations\Update\ChangeTo{
 	/**
 	 * This method returns update clause which will be later on passed to collection
-	 * 
+	 *
 	 * @param 	$data		Data from request
 	 * @param	$params		Arrays with possible additional params (for different modes of updater
-	 * 
+	 *
 	 * @return	Based on mode of updater, either update clause or updated document
 	 */
 	public function getUpdateClause($data, $params = array() ){
-		$data = (int)$data == 1;
+		$data = $this->attribute->getInputFilter()->clean($data, "alnum");
+		$values = array( "published", "unpublished" );
 		
-		switch( $this->attribute->getUpdaterMode() ){
-			case 0: // buk update
-				{
-					return array('$set', array( $this->attribute->getAttributeCollection() => $data ));
-				}
-			case 1: // document-by-document
-				{
-					$doc = $params['document'];
-					$doc[$this->attribute->getAttributeCollection()] = $data;
-					return $doc;
-				}
+		if( in_array( $data, $values ) === false ){ // not a possible value
+			return null;
 		}
-	}
 		
+		return parent::getUpdateClause( $data, $params );
+	}
+
 	/**
 	 * This method returns string representation how the operation should be rendered in form
 	 */
@@ -39,10 +32,10 @@ class Boolean extends \MassUpdate\Operations\Update{
 		$name = $this->attribute->getAttributeCollection();
 		$html = '
 				<select name="'.$this->getNameWithIdx().'" id="'.$this->getNameWithIdx().'" class="form-control">
-					<option value="1">True</option>
-					<option value="0">False</option>
+					<option value="published">Published</option>
+					<option value="unpublished">Unpublished</option>
 				</select>
-				';
+				';		
 		
 		return $html;
 	}
@@ -52,16 +45,7 @@ class Boolean extends \MassUpdate\Operations\Update{
 	 * operation in form
 	 */
 	public function getGenericLabel(){
-		return "Change boolean value to";
-	}
-
-	/**
-	 * This method returns nature of this operation - whether it uses mdoel's filter or generates its own where clause statement
-	 *
-	 * @return True if it uses model's filter
-	 */
-	public function getNatureOfOperation(){
-		return false;
+		return "Set Published Status to";
 	}
 }
 ?>

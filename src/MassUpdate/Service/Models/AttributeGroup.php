@@ -93,15 +93,15 @@ class AttributeGroup extends \Prefab
 	 * 
 	 * @return Instance of this class in order to support chaining of operations
 	 */
-	public function addOperation( $op, $type, $params = array() ){
+	public function addOperation( $op, $params = array() ){
 		if( $op instanceof \MassUpdate\Operations\Operation ){
 			
 			$op->setAttribute( $this );
-			if( !isset( $this->operations[$type] ) ){
-				$this->operations[$type] = array();
+			if( !isset( $this->operations[$op->getTypeString()] ) ){
+				$this->operations[$op->getTypeString()] = array();
 			}			
 			$op->setParams( $params );
-			$this->operations[$type] []= $op;
+			$this->operations[$op->getTypeString()] []= $op;
 				
 		} else { // warn us, if we pass here instance of an unsupported object
 			throw new \Exception( "Unsupported Operation object" );
@@ -178,9 +178,18 @@ class AttributeGroup extends \Prefab
 	 * 
 	 * @return	Pointer to this instance in order to support chaining
 	 */
-	public function setModel($model){
+	public function setParentModel($model){
 		$this->model = clone $model;
 		return $this;
+	}
+
+	/**
+	 * This method sets  model associated to this attribute
+	 *
+	 * @return	Current model
+	 */
+	public function getParentModel(){
+		return $this->model;
 	}
 	
 	/**
@@ -189,7 +198,7 @@ class AttributeGroup extends \Prefab
 	 * @return Instance of model associatedto this attribute
 	 */
 	public function getModel(){
-		return $this->model;
+		return $this->model->getModel();
 	}
 	
 	/**

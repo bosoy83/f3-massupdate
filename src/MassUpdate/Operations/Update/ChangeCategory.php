@@ -37,7 +37,7 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 				break;
 			}
 			$cat_id = new \MongoId( (string)$cat  );
-			$act_cat = $this->attribute->getModel()->collection()->find( array( "_id" => $cat_id ) )->skip(0)->limit(1);
+			$act_cat = $this->model->collection()->find( array( "_id" => $cat_id ) )->skip(0)->limit(1);
 			if( !$act_cat->hasNext() ){
 				continue;
 			}
@@ -135,7 +135,8 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 	 * This method returns string representation how the operation should be rendered in form
 	 */
 	public function getFormHtml(){
-		$categories = $this->attribute->getModel()->emptyState()->populateState()->getItems();
+		
+		$categories = $this->model->emptyState()->populateState()->getItems();
 		$html = '';
 		$name = $this->getNameWithIdx();
 		static $add_js = true;
@@ -255,7 +256,7 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 		$html .= '</div>';
 
 		$additional_data = array(
-			'data-model="'.$this->attribute->getModel()->getSlugMassUpdate().'"',
+			'data-model="'.$this->attribute->getParentModel()->getSlug().'"',
 			'data-group="'.$this->attribute->getGroupName().'"',
 			'data-attr="'.$this->attribute->getAttributeCollection().'"',
 			'data-op="'.$this->idx.'"',
@@ -303,7 +304,7 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 	 */
 	private function getParentSelectHtml($categories = ''){
 		if( empty( $categories ) ){
-			$categories = $this->attribute->getModel()->emptyState()->populateState()->getItems();
+			$categories = $this->model->emptyState()->populateState()->getItems();
 		}
 		
 		$html  = '<select name="parent" class="form-control">
@@ -344,6 +345,12 @@ class ChangeCategory extends \MassUpdate\Operations\Update{
 			$this->metastamp = false;
 		} else {
 			$this->metastamp = (int)$params[ 'metastamp' ];
+		}
+		
+		if( empty( $params[ 'model' ]) ){
+			$this->model = new \Dsc\Mongo\Collections\Categories;
+		} else {
+			$this->model = $params[ 'model' ];
 		}
 		
 		if( !empty( $params['attribute_dt'] ) && is_array( $params['attribute_dt'] ) ) {

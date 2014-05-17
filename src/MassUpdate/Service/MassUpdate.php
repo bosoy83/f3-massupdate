@@ -3,41 +3,35 @@ namespace MassUpdate\Service;
 
 class MassUpdate extends \Prefab 
 {
-	private $list_groups = array();
+	private $list_apps = array();
 	private $initialized = false;
-	
-	/**
-	 * Registers models which are able to integrate with f3-massupdate
-	 * 
-	 * @param $group		Group with title and list of supported models
-	 */
-	public function registerGroup( $group ){
-		if( $group instanceof \MassUpdate\Service\Models\Group ){
-			$name = $group->getName();
-			if( empty( $this->list_groups[$name]) ){
-				$this->list_groups[$name] = $group;
-			} else {
-				throw new \Exception("Mass Update Group with name '".$name."' already exists in Mass Update!");
-			}
-		} else {
-			throw new \Exception( "Group you want to register for Mass Update is not an instance of the correct class" );
-		}
-	}
 
 	/**
 	 * Lets all registered groups initialize
 	 */
-	public function initializeGroups(){
+	public function initializeApps(){
 		if( $this->initialized ){
 			return;
 		}
 		
 		// get current mode from Settings model
 		$settings = \MassUpdate\Admin\Models\Settings::fetch();
-		$current_settings = $settings->populateState()->getItem();
-		if( count( $this->list_groups ) > 0 ){
-			foreach( $this->list_groups as $group ){
-				$group->initialize($current_settings['general.updater_mode']);
+		$paths = \Base::instance()->get('dsc.massupdate.paths');
+		
+		if( !empty( $paths ) ){
+			foreach ($paths as $path)
+			{
+				if (file_exists( $path . '/App.php' )) {
+					$app = null;
+					require $path . '/App.php';
+					if( $app != null ){
+						$res = $app->initialize($settings->{'general.updater_mode'});
+							
+						if( $res ) {
+							$this->list_apps[$app->getName()] = $app;
+						}
+					}
+				}
 			}
 		}
 		$this->initialized = true;
@@ -46,8 +40,8 @@ class MassUpdate extends \Prefab
 	/**
 	 * Gets you list of all registered groups
 	 */
-	public function getGroups(){
-		return $this->list_groups;
+	public function getApps(){
+		return $this->list_apps;
 	}
 	
 	/**
@@ -57,12 +51,12 @@ class MassUpdate extends \Prefab
 	 * 
 	 * @return	Instance of Group of models
 	 */
-	public function getGroup($slug){
-		if( count( $this->list_groups ) > 0 ){
-			if( empty( $this->list_groups[$slug] ) ){
+	public function getApp($slug){
+		if( count( $this->list_apps ) > 0 ){
+			if( empty( $this->list_apps[$slug] ) ){
 				return null;
 			} else {
-				return $this->list_groups[$slug];
+				return $this->list_apps[$slug];
 			}
 		} else {
 			return null;
@@ -77,22 +71,21 @@ class MassUpdate extends \Prefab
 	 * 
 	 * @return	Instance of model or null in case it wasnt found
 	 */
-	public function getModel( $model, $group ){
-		if( empty( $model ) || empty( $group ) ){
+	public function getModel( $model, $app ){
+		if( empty( $model ) || empty( $app ) ){
 			throw new \Exception("Missing parameters in MassUpdate service in method getModel");
-		} 
-		
-		if( is_string( $group ) ) {
-			$group = $this->getGroup( $group );
-			if( empty( $group )	 ){
+		}
+
+		if( is_string( $app ) ) {
+			$app = $this->getApp( $app );
+			if( empty( $app )	 ){
 				return null;
 			}
 		}
 		
-		
 		$res = null;
 			// find selected model
-		if( count( $models = $group->getModels() ) > 0 ){
+		if( count( $models = $app->getModels() ) > 0 ){
 			if( empty( $models[$model] ) ){
 				return null;
 			} else {
@@ -101,5 +94,4 @@ class MassUpdate extends \Prefab
 		}
 		return $res;
 	}
-
 }

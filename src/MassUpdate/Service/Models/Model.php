@@ -1,22 +1,31 @@
 <?php
-namespace MassUpdate\Service\Traits;
 
-trait Model
+namespace MassUpdate\Service\Models;
+
+abstract class Model
 {
 	/**
-	 * This trait requires interface \MassUpdate\Models\MassUpdateOperations
+	 * This method returns an instance of model
 	 */
+	abstract public function getModel();
+	
+	/**
+	 * This method gets list of attribute groups with operations
+	 *
+	 * @return	Array with attribute groups
+	 */
+	abstract public function getOperationGroups();
 	
 	/**
 	 * Array with all attribute groups
 	 */
-	private $MU_operations = array();
+	protected $MU_operations = array();
 	
 	/**
 	 * This method returns unique string identifying this model.
 	 * The unique identifier is generated from namespaced class name of the model
 	 */
-	public function getSlugMassUpdate($with = '-'){
+	public function getSlug($with = '-'){
 		return str_replace( '\\', $with, get_class( $this ) );
 	}
 	
@@ -24,14 +33,10 @@ trait Model
 	 * This method returns title for this model
 	 * The title is generated from class name of the model (excluding namespace)
 	 */
-	public function getTitleMassUpdate(){
+	public function getTitle(){
 		$names = explode( '\\', get_class( $this ) );
 		$c = count( $names );
-		$title = $names[$c-1];
-		if( $c == 1 ){
-			$title = $names[0];
-		}
-		return $title;
+		return $names[$c-1];
 	}
 	
 	/**
@@ -39,7 +44,7 @@ trait Model
 	 * 
 	 * @return True or false
 	 */
-	public function needInitializationMassUpdate(){
+	public function needInitialization(){
 		return empty( $this->MU_operations );
 	}
 	
@@ -48,7 +53,7 @@ trait Model
 	 * 
 	 * @param unknown $group
 	 */
-	private function addAttributeGroupMassUpdate($group){
+	protected function addAttributeGroup($group){
 		$attr = $group->getAttributeCollection();
 		
 		if( empty( $this->MU_operations[$attr] ) ){
@@ -70,9 +75,9 @@ trait Model
 	 * @param $operation	Name of operation
 	 * @param $type			Type of operation
 	 */
-	public function getOperationMassUpdate( $attribute, $operation, $type ){
-		if( $this->needInitializationMassUpdate() ){
-			$this->getMassUpdateOperationGroups();
+	public function getOperation( $attribute, $operation, $type ){
+		if( $this->needInitialization() ){
+			$this->getOperationGroups();
 		}
 		
 		if( empty( $this->MU_operations[$attribute] ) ) {
@@ -86,7 +91,7 @@ trait Model
 	 * 
 	 * @return Array with all attribute groups
 	 */
-	public function getAttributeGroupsMassUpdate(){
+	public function getAttributeGroups(){
 		return $this->MU_operations;
 	}
 }

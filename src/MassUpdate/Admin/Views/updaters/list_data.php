@@ -1,5 +1,5 @@
 <?php 
-	$attrs = $model->getMassUpdateOperationGroups();
+	$attrs = $model->getOperationGroups();
 ?>
 <form id="updaters" class="massupdaterForm" action="./admin/massupdate/updaters/<?php echo $selected_updater;?>/<?php echo $selected_model;?>" method="post">	
 	<div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 pull-left">

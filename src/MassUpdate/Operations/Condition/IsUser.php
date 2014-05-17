@@ -39,18 +39,13 @@ class IsUser extends \MassUpdate\Operations\Condition{
 		$html = '';
 		$name_with_idx = $this->getNameWithIdx();
 		
-		$html .= '
-					<div class="pull-left">
-						<div class="input-group col-md-8 pull-left">
-							<select name="'.$this->getNameWithIdx().'" id="'.$this->getNameWithIdx().'">';
+		$html .= '<select name="'.$this->getNameWithIdx().'" id="'.$this->getNameWithIdx().'" class="form-control">';
 		if( count( $users ) > 0 ){
 			foreach( $users as $user ){
 				$html .= '<option value="'.$user['_id'].'">'.$user['first_name'].' '.$user['last_name'].'</option>';
 			}
 		}
-		$html .= '			</select>
-						</div>
-					</div>';
+		$html .= '</select>';
 		
 		return $html;
 	}

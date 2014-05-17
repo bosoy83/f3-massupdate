@@ -34,7 +34,7 @@ class Boolean extends \MassUpdate\Operations\Condition{
 	public function getFormHtml(){
 		$name = $this->attribute->getAttributeCollection();
 		$html = '
-				<select name="'.$this->getNameWithIdx().'" id="'.$this->getNameWithIdx().'">
+				<select name="'.$this->getNameWithIdx().'" id="'.$this->getNameWithIdx().'" class="form-control">
 					<option value="1">True</option>
 					<option value="0">False</option>
 				</select>

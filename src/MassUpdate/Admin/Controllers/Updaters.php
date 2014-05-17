@@ -19,7 +19,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		$f3->set('subtitle', '');
 		
 		$service = \Dsc\System::instance()->get('massupdate');
-		$service->initializeGroups();
+		$service->initializeApps();
 		$f3->set('service', $service );
 		$f3->set('selected_updater', $updater );
 		$f3->set('selected_model', $model );
@@ -30,16 +30,16 @@ class Updaters extends \Admin\Controllers\BaseAuth
 
 	private function getModelsMetadata(){
 		$models = array();
-		$updaters = \Dsc\System::instance()->get('massupdate')->getGroups();
+		$updaters = \Dsc\System::instance()->get('massupdate')->getApps();
 		if( count( $updaters ) > 0 ) {
 			foreach($updaters as $updater ) {
 				if( count( $updater->getModels() ) > 0 ){
 					$m = $updater->getModels();
 					foreach( $m as $model ){
 						$models []= array(
-								'slug' => $model->getSlugMassUpdate(),
+								'slug' => $model->getSlug(),
 								'updater' => $updater->getName(),
-								'title' => $model->getTitleMassUpdate(),
+								'title' => $model->getTitle(),
 								'title_updater' => $updater->title
 						);
 					}
@@ -58,7 +58,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 			return "";
 		}
 		$service = \Dsc\System::instance()->get('massupdate');
-		$service->initializeGroups();
+		$service->initializeApps();
 		$selected_model = $service->getModel($model, $updater);
 		if( $selected_model != null ){
 			$f3 = \Base::instance();
@@ -90,18 +90,19 @@ class Updaters extends \Admin\Controllers\BaseAuth
 			throw new \Exception("Could not find appropriate model and updater in controller Updaters");
 		}
 		$service = \Dsc\System::instance()->get('massupdate');
-		$service->initializeGroups();
+		$service->initializeApps();
 		$selected_model = $service->getModel($model_name, $updater);
-		
+				
 		if( $selected_model == null ){
 			\Dsc\System::instance()->addMessage( "This model does not exist", "error" );
 			echo $this->getListHtml( "", "" );
 			return;
 		}
+		
 		$where_part = $this->processWherePart( $selected_model );
 		$update_operations = $this->processSpecificPart( $selected_model, "update" );
 		
-		$collection = $selected_model->collection();
+		$collection = $selected_model->getModel()->collection();
 		
 		$model_settings = $this->getModel();
 		$settings = $model_settings->populateState()->getItem();
@@ -227,26 +228,28 @@ class Updaters extends \Admin\Controllers\BaseAuth
 				'error_msg' => ""
 		);
 		
+		
+		$model = $selected_model->getModel();
 		$cursor = $collection->find( $where_part );
 		$num = 0;
 		foreach( $cursor as $doc ){
-			$selected_model->bind( $doc );
+			$model->bind( $doc );
 			
 			foreach( $update_data as $op ){
 				$op[0]->setIndex( $op[2]);
-				$params['document'] = $selected_model;
+				$params['document'] = $model;
 
 				$res_op = $op[0]->getUpdateClause( $op[1], $params );
 				// skip clauses which couldnt create a where condition
 				if( $res_op == null ){
 					continue;
 				} else {
-					$selected_model = $res_op;
+					$model = $res_op;
 				}
 			}	
 			$collection->update(
-                			array('_id'=> new \MongoId((string) $selected_model->get('id') ) ),
-                			$selected_model->cast(),
+                			array('_id'=> new \MongoId((string) $model->get('id') ) ),
+                			$model->cast(),
 					   		array('upsert'=>true, 'multiple'=>false)
 					);
 
@@ -271,7 +274,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 	 */
 	private function processSpecificPart(  $selected_model, $type ){
 		$result = array();
-		$attr_groups = $selected_model->getMassUpdateOperationGroups();
+		$attr_groups = $selected_model->getOperationGroups();
 		$request = \Base::instance()->get('REQUEST');
 		if( count( $attr_groups ) > 0 ){
 			foreach( $attr_groups as $attr ){
@@ -346,15 +349,16 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		}
 		
 		// now, we should union specified conditions with the one used via filters
-		$selected_model->emptyState()->populateState();
+		$model = $selected_model->getModel();
+		$model->emptyState()->populateState();
 		if( count( $filters) > 0 ){
 			// yes, we need to merge with filters
-			$state  = $selected_model->getState();
+			$state  = $model->getState();
 			foreach($filters as $filter ){
 				$state->set('filter.'.$filter->{"filter"}, $filter->{"val"});
 			}
 		}
-		$conditions = $selected_model->conditions() + $conditions;
+		$conditions = $model->conditions() + $conditions;
 		
 		return $conditions;
 	}
@@ -418,6 +422,7 @@ class Updaters extends \Admin\Controllers\BaseAuth
 		$op_type = $inputFilter->clean( $request['op_type'], 'alnum' );
 		
 		$service = \Dsc\System::instance()->get( 'massupdate' );
+		$service->initializeApps();
 		$model = $service->getModel( $model_name, $group );
 		if( empty( $model ) ){
 			$res = array(
@@ -426,8 +431,8 @@ class Updaters extends \Admin\Controllers\BaseAuth
 			);
 			return $this->getJsonResponse($res);
 		}
-		$op = $model->getOperationMassUpdate( $attr_name, $op_index, $op_type );
-		if( empty( $model ) ){
+		$op = $model->getOperation( $attr_name, $op_index, $op_type );
+		if( empty( $op ) ){
 			$res = array(
 					'error' => true,
 					'message' => 'Operation at index '.$op_index.' (type - '.$op_type.') does not exist in attribute '.$attr_name,

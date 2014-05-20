@@ -24,12 +24,12 @@ class Listener extends \Prefab
             $children = array(
                 array(
                     'title' => 'List Updaters',
-                    'route' => '/admin/massupdate/updaters',
+                    'route' => './admin/massupdate/updaters',
                     'icon' => 'fa fa-list'
                 ),
                 array(
                     'title' => 'Settings',
-                    'route' => '/admin/massupdate/settings',
+                    'route' => './admin/massupdate/settings',
                     'icon' => 'fa fa-cogs'
                 )
             );
